@@ -1,17 +1,33 @@
 package model;
 
+import jakarta.persistence.*;
+import org.hibernate.annotations.Temporal;
+
 import java.util.Date;
 
-public class Incidente {
+@Entity
+@Table(name = "incidente")
 
+public class Incidente{
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int codigo;
     private String titulo;
     private String descricao;
     private String relevancia;
+
+    @Column(name = "data_incidente")
     private Date dataIncidente;
     private String status;
-    private int usuarioId; //fk
+    @Column(name = "usuario_id")
+    private int usuarioId;
+
     private String responsavel;
+
+    public Incidente(){
+        this.dataIncidente = new Date();
+    }
+
 
     public String getResponsavel() {
         return responsavel;

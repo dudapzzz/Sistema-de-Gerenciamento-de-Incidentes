@@ -1,11 +1,22 @@
 package model;
 
+import jakarta.persistence.*;
+
+@Entity
+@Table(name= "ativo")
 public class Ativo {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String nome;
     private String tipo;
+
+    @Column(name = "ip_ou_url")
     private String ipOuUrl;
     private String criticidade;
+
+    @Column(name = "usuario_id")
     private int usuarioId;
 
     public int getId() {

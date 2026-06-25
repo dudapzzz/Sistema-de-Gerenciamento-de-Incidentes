@@ -1,7 +1,12 @@
 package model;
 
-public class Usuario {
+import jakarta.persistence.*;
 
+@Entity
+@Table(name = "usuario")
+public class Usuario{
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int codigo;
     private String nome;
     private String email;
@@ -11,13 +16,12 @@ public class Usuario {
     public Usuario(){
     }
 
-    //construtor completo
     public Usuario(int codigo, String nome, String email, String senha, boolean ativo){
         this.codigo = codigo;
-        this.nome= nome;
+        this.nome = nome;
         this.email = email;
-        this.senha= senha;
-        this.ativo= ativo;
+        this.senha = senha;
+        this.ativo = ativo;
     }
 
     public int getCodigo() {
