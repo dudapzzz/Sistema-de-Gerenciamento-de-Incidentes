@@ -14,7 +14,7 @@ import service.UsuarioService;
 public class CadastroController {
     private final UsuarioService usuarioService;
 
-    public CadastroController(usuarioService usuarioService){
+    public CadastroController(UsuarioService usuarioService){
         this.usuarioService= usuarioService;
     }
 
