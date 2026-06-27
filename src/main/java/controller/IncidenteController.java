@@ -6,6 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import service.IncidenteService;
+import util.GerenciadorLogs;
 
 @Controller
 @RequestMapping("/incidente")
@@ -87,6 +88,8 @@ public class IncidenteController{
         boolean sucesso = service.salvar(incidente);
 
         if(sucesso){
+
+            GerenciadorLogs.registrar("Incidente '" +incidente.getTitulo() + "' foi salvo pelo usuario de ID: " + usuarioLogado.getCodigo());
             return "redirect:/incidente/listar";
         }else{
             model.addAttribute("incidente", incidente);
