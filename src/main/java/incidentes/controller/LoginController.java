@@ -22,7 +22,7 @@ public class LoginController{
         if("sucesso".equals(msg)){
             model.addAttribute("mensagemSucesso", "Usuario cadastrado com sucesso, faça o seu login!");
         }
-        return "../login";
+        return "login";
     }
 
     @PostMapping("/login")
@@ -38,7 +38,7 @@ public class LoginController{
             return "redirect:/pagina_inicial";
         }else{
             model.addAttribute("erro", "Email ou senha incorretos");
-            return "../login";
+            return "login";
         }
 
     }

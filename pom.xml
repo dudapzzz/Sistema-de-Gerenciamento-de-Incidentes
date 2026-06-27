@@ -11,6 +11,7 @@
   <groupId>org.gestaomvc</groupId>
   <artifactId>gestao-produtos-mvc</artifactId>
   <version>0.0.1-SNAPSHOT</version>
+
   <name>gestao-produtos-mvc</name>
   <description>gestao-produtos-mvc</description>
   <url/>
