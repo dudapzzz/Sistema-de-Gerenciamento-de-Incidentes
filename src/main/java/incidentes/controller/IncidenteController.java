@@ -1,12 +1,12 @@
 package incidentes.controller;
 
-import model.Incidente;
-import model.Usuario;
+import incidentes.model.Incidente;
+import incidentes.model.Usuario;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import service.IncidenteService;
-import util.GerenciadorLogs;
+import incidentes.service.IncidenteService;
+import incidentes.util.GerenciadorLogs;
 
 @Controller
 @RequestMapping("/incidente")

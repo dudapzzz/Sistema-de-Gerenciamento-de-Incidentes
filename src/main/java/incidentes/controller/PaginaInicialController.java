@@ -1,11 +1,11 @@
 package incidentes.controller;
 
-import model.Usuario;
+import incidentes.model.Usuario;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.SessionAttribute;
-import service.IncidenteService;
+import incidentes.service.IncidenteService;
 
 //indica que é uma classe controller que processa requisições
 @Controller

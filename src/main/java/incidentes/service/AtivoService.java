@@ -1,7 +1,7 @@
 package incidentes.service;
 
-import dao.AtivoDAO;
-import model.Ativo;
+import incidentes.dao.AtivoDAO;
+import incidentes.model.Ativo;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

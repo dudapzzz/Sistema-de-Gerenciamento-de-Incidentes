@@ -1,11 +1,11 @@
 package incidentes.controller;
 
-import model.Ativo;
-import model.Usuario;
+import incidentes.model.Ativo;
+import incidentes.model.Usuario;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import service.AtivoService;
+import incidentes.service.AtivoService;
 
 @Controller
 @RequestMapping("/ativo")

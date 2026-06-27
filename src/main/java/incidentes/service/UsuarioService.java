@@ -1,7 +1,7 @@
 package incidentes.service;
 
-import dao.UsuarioDAO;
-import model.Usuario;
+import incidentes.dao.UsuarioDAO;
+import incidentes.model.Usuario;
 import org.springframework.stereotype.Service;
 
 @Service

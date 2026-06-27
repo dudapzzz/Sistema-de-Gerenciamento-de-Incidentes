@@ -1,7 +1,7 @@
 package incidentes.service;
 
-import dao.IncidenteDAO;
-import model.Incidente;
+import incidentes.dao.IncidenteDAO;
+import incidentes.model.Incidente;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedHashMap;

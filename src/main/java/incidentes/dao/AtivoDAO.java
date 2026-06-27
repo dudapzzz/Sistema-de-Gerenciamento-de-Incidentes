@@ -1,6 +1,6 @@
 package incidentes.dao;
 
-import model.Ativo;
+import incidentes.model.Ativo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,12 +1,12 @@
 package incidentes.controller;
 
-import model.Usuario;
+import incidentes.model.Usuario;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import service.UsuarioService;
+import incidentes.service.UsuarioService;
 
 @Controller
 @RequestMapping("/cadastro_usuario")
