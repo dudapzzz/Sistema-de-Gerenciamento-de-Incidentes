@@ -1,4 +1,4 @@
-package service;
+package incidentes.service;
 
 import dao.AtivoDAO;
 import model.Ativo;

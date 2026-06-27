@@ -1,4 +1,4 @@
-package controller;
+package incidentes.controller;
 
 import jakarta.servlet.http.HttpSession;
 import model.Usuario;

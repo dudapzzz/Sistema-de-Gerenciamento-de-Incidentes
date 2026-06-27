@@ -1,4 +1,4 @@
-package model;
+package incidentes.model;
 
 import jakarta.persistence.*;
 

@@ -1,4 +1,4 @@
-package service;
+package incidentes.service;
 
 import dao.UsuarioDAO;
 import model.Usuario;

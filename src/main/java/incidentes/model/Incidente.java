@@ -1,7 +1,6 @@
-package model;
+package incidentes.model;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.Temporal;
 
 import java.util.Date;
 

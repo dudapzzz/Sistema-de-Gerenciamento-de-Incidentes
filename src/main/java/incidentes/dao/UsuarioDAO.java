@@ -1,4 +1,4 @@
-package dao;
+package incidentes.dao;
 
 import model.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;

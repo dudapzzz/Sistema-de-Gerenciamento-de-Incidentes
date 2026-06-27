@@ -1,4 +1,4 @@
-package controller;
+package incidentes.controller;
 
 import model.Incidente;
 import model.Usuario;

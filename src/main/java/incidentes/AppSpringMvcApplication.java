@@ -3,7 +3,7 @@ package incidentes;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication(scanBasePackages = {"controller", "service", "dao", "model", "util"})
+@SpringBootApplication
 public class AppSpringMvcApplication {
 
     public static void main(String[] args) {
