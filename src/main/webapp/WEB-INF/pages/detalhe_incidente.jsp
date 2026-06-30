@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detalhes do Incidente</title>
-    <link rel="stylesheet" type="text/css" href="style.css?v=4">
+    <link rel="stylesheet" type="text/css" href="/style.css?v=4">
 </head>
 
 <body>
@@ -20,7 +20,7 @@
                     <div class="avatar" aria-label="Menu do usuário"></div>
                 </summary>
                 <div class="user-dropdown">
-                    <a href="logout">Sair da conta</a>
+                    <a href="/logout">Sair da conta</a>
                 </div>
             </details>
         </div>
@@ -29,12 +29,12 @@
     <div class="body">
         <aside class="sidebar">
             <nav class="nav">
-                <a href="inicio">Início</a>
-                <a href="incidente?acao=form">Registrar Incidente</a>
-                <a href="incidente?acao=listar" class="active">Visualizar Incidentes</a>
-                <a href="relatorios">Relatórios</a>
-                <a href="ativo?acao=listar">Dispositivos Monitorados</a>
-                <a href="ativo?acao=form">Registrar Dispositivos</a>
+                <a href="/inicio">Início</a>
+                <a href="/incidente/form">Registrar Incidente</a>
+                <a href="/incidente/listar" class="active">Visualizar Incidentes</a>
+                <a href="/relatorios">Relatórios</a>
+                <a href="/ativo/listar">Dispositivos Monitorados</a>
+                <a href="/ativo/form">Registrar Dispositivos</a>
             </nav>
         </aside>
 
@@ -78,9 +78,9 @@
             </div>
 
             <div class="actions" style="width: 100%; max-width: 760px; justify-content: flex-start;">
-                <a href="incidente?acao=listar" class="btn-action btn-edit" style="text-decoration: none;">Voltar</a>
-                <a href="incidente?acao=form&id=${incidente.codigo}" class="btn-action btn-details" style="text-decoration: none;">Editar</a>
-                <a href="incidente?acao=excluir&id=${incidente.codigo}"
+                <a href="/incidente/listar" class="btn-action btn-edit" style="text-decoration: none;">Voltar</a>
+                <a href="/incidente/form?id=${incidente.codigo}" class="btn-action btn-details" style="text-decoration: none;">Editar</a>
+                <a href="/incidente/excluir?id=${incidente.codigo}"
                    class="btn-action btn-delete"
                    onclick="return confirm('Tem certeza que deseja excluir este incidente?');">
                     Excluir
@@ -91,4 +91,3 @@
 </div>
 </body>
 </html>
-

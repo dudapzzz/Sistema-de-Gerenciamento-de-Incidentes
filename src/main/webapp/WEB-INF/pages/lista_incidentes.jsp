@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Visualizar Incidentes</title>
-    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" type="text/css" href="/style.css">
     <style>
         /* Ajuste de cores de relevância padronizadas */
         .rel-alta, .rel-critica { color: var(--danger) !important; font-weight: bold; }
@@ -26,7 +26,7 @@
                     <div class="avatar" aria-label="Menu do usuário"></div>
                 </summary>
                 <div class="user-dropdown">
-                    <a href="logout">Sair da conta</a>
+                    <a href="/logout">Sair da conta</a>
                 </div>
             </details>
         </div>
@@ -35,19 +35,19 @@
     <div class="body">
         <aside class="sidebar">
             <nav class="nav">
-                <a href="inicio">Início</a>
-                <a href="incidente?acao=form">Registrar Incidente</a>
-                <a href="incidente?acao=listar" class="active">Visualizar Incidentes</a>
-                <a href="relatorios">Relatórios</a>
-                <a href="ativo?acao=listar">Dispositivos Monitorados</a>
-                <a href="ativo?acao=form">Registrar Dispositivos</a>
+                <a href="/inicio">Início</a>
+                <a href="/incidente/form">Registrar Incidente</a>
+                <a href="/incidente/listar" class="active">Visualizar Incidentes</a>
+                <a href="/relatorios">Relatórios</a>
+                <a href="/ativo/listar">Dispositivos Monitorados</a>
+                <a href="/ativo/form">Registrar Dispositivos</a>
             </nav>
         </aside>
 
         <main class="main">
             <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px;">
                 <h1>Todos os Incidentes Registrados</h1>
-                <a href="incidente?acao=form" class="btn btn-primary" style="text-decoration: none;">+ Novo Incidente</a>
+                <a href="/incidente/form" class="btn btn-primary" style="text-decoration: none;">+ Novo Incidente</a>
             </div>
 
             <div class="table-container">
@@ -87,11 +87,11 @@
                                         </span>
                                     </td>
                                     <td style="text-align: center;">
-                                        <a href="incidente?acao=detalhes&id=${inc.codigo}" class="btn-action btn-details">
+                                        <a href="/incidente/detalhes?id=${inc.codigo}" class="btn-action btn-details">
                                             Ver detalhes
                                         </a>
-                                        <a href="incidente?acao=form&id=${inc.codigo}" class="btn-action btn-edit">Editar</a>
-                                        <a href="incidente?acao=excluir&id=${inc.codigo}"
+                                        <a href="/incidente/form?id=${inc.codigo}" class="btn-action btn-edit">Editar</a>
+                                        <a href="/incidente/excluir?id=${inc.codigo}"
                                            class="btn-action btn-delete"
                                            onclick="return confirm('Tem certeza que deseja excluir este incidente?');">
                                             Excluir

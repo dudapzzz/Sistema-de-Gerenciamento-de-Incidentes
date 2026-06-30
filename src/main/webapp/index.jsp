@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Sistema de Incidentes</title>
-    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" type="text/css" href="/style.css">
 </head>
 <body>
 
@@ -12,8 +12,8 @@
     <nav class="navbar">
         <div class="logo">Incidentes<span>Gerenciados</span></div>
         <div class="auth-buttons">
-            <a href="login.jsp" class="btn-login">Entrar</a>
-            <a href="cadastro_usuario" class="btn-signup">Cadastre-se</a>
+            <a href="/login" class="btn-login">Entrar</a>
+            <a href="/cadastro_usuario" class="btn-signup">Cadastre-se</a>
         </div>
     </nav>
 </header>

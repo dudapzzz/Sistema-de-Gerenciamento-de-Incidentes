@@ -6,7 +6,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>${not empty ativo.id ? 'Editar' : 'Novo'} Ativo</title>
-    <link rel="stylesheet" type="text/css" href="style.css?v=4">
+    <link rel="stylesheet" type="text/css" href="/style.css?v=4">
 </head>
 <body>
 <div class="app">
@@ -19,7 +19,7 @@
                     <div class="avatar"></div>
                 </summary>
                 <div class="user-dropdown">
-                    <a href="logout">Sair da conta</a>
+                    <a href="/logout">Sair da conta</a>
                 </div>
             </details>
         </div>
@@ -28,12 +28,12 @@
     <div class="body form-layout">
         <aside class="sidebar">
             <nav class="nav">
-                <a href="inicio">Início</a>
-                <a href="incidente?acao=form">Registrar Incidente</a>
-                <a href="incidente?acao=listar">Visualizar Incidentes</a>
-                <a href="relatorios">Relatórios</a>
-                <a href="ativo?acao=listar">Dispositivos Monitorados</a>
-                <a href="ativo?acao=form"class="active">Registrar Dispositivos</a>
+                <a href="/inicio">Início</a>
+                <a href="/incidente/form">Registrar Incidente</a>
+                <a href="/incidente/listar">Visualizar Incidentes</a>
+                <a href="/relatorios">Relatórios</a>
+                <a href="/ativo/listar">Dispositivos Monitorados</a>
+                <a href="/ativo/form"class="active">Registrar Dispositivos</a>
             </nav>
         </aside>
 
@@ -47,7 +47,7 @@
             </c:if>
 
             <div class="form-container">
-                <form action="ativo" method="POST">
+                <form action="/ativo/salvar" method="POST">
                     <input type="hidden" name="id" value="${not empty ativo.id ? ativo.id : '0'}" />
 
                     <div class="form-group">
@@ -81,7 +81,7 @@
 
                     <div class="form-actions">
                         <button type="submit" class="btn btn-success">Salvar</button>
-                        <a href="ativo?acao=listar" class="btn btn-cancel">Cancelar</a>
+                        <a href="/ativo/listar" class="btn btn-cancel">Cancelar</a>
                     </div>
                 </form>
             </div>

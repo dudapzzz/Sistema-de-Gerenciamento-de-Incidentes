@@ -6,7 +6,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Início - Sistema de Incidentes</title>
-    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" type="text/css" href="/style.css">
     <style>
         .rel-alta { color: var(--danger) !important; font-weight: bold; }
         .rel-media { color: var(--warning) !important; font-weight: bold; }
@@ -40,7 +40,7 @@
                     <div class="avatar" aria-label="Menu do usuário"></div>
                 </summary>
                 <div class="user-dropdown">
-                    <a href="logout">Sair da conta</a>
+                    <a href="/logout">Sair da conta</a>
                 </div>
             </details>
         </div>
@@ -49,12 +49,12 @@
     <div class="body">
         <aside class="sidebar">
             <nav class="nav">
-                <a href="inicio"class="active">Início</a>
-                <a href="incidente?acao=form">Registrar Incidente</a>
-                <a href="incidente?acao=listar">Visualizar Incidentes</a>
-                <a href="relatorios">Relatórios</a>
-                <a href="ativo?acao=listar">Dispositivos Monitorados</a>
-                <a href="ativo?acao=form">Registrar Dispositivos</a>
+                <a href="/inicio"class="active">Início</a>
+                <a href="/incidente/form">Registrar Incidente</a>
+                <a href="/incidente/listar">Visualizar Incidentes</a>
+                <a href="/relatorios">Relatórios</a>
+                <a href="/ativo/listar">Dispositivos Monitorados</a>
+                <a href="/ativo/form">Registrar Dispositivos</a>
             </nav>
         </aside>
 
@@ -80,7 +80,7 @@
 
             <div class="section-head">
                 <h2>Incidentes Recentes</h2>
-                <a href="incidente?acao=listar" class="link">Ver todos</a>
+                <a href="/incidente/listar" class="link">Ver todos</a>
             </div>
 
             <div class="table-wrap">
@@ -116,7 +116,7 @@
                                 </span>
                             </td>
                             <td>
-                                <a href="incidente?acao=detalhes&id=${inc.codigo}" class="btn-action btn-details">
+                                <a href="/incidente/detalhes?id=${inc.codigo}" class="btn-action btn-details">
                                     Ver detalhes
                                 </a>
                             </td>
@@ -142,12 +142,12 @@
                 <div class="card report">
                     <h3>Relatórios por Relevância e Status dos Incidentes</h3>
                     <p style="margin-bottom: 25px;">Visualize dois relatórios que mostram a situação atual dos incidentes cadastrados.</p>
-                    <a href="relatorios" class="btn btn-primary" style="text-decoration: none;">Ver Relatórios</a>
+                    <a href="/relatorios" class="btn btn-primary" style="text-decoration: none;">Ver Relatórios</a>
                 </div>
             </section>
 
             <div class="actions">
-                <a href="incidente?acao=form" class="btn btn-success" style="text-decoration: none;">+ Novo incidente</a>
+                <a href="/incidente/form" class="btn btn-success" style="text-decoration: none;">+ Novo incidente</a>
             </div>
         </main>
     </div>

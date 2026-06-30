@@ -6,7 +6,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import incidentes.service.IncidenteService;
-import incidentes.util.GerenciadorLogs;
 
 @Controller
 @RequestMapping("/incidente")
@@ -22,7 +21,7 @@ public class IncidenteController{
     public String listar(@SessionAttribute(value="usuarioLogado", required = false) Usuario usuarioLogado,
                          Model model){
         if(usuarioLogado == null){
-            return "redirect: /login.jsp";
+            return "redirect:/login";
         }
         // addatribute insere par chave-valor, passa os dados p interface
         model.addAttribute("listaIncidentes", service.listarTodos(usuarioLogado.getCodigo()));
@@ -34,7 +33,7 @@ public class IncidenteController{
             @SessionAttribute(value = "usuarioLogado", required = false) Usuario usuarioLogado,
             Model model){
         if(usuarioLogado == null){
-            return "redirect:/login.jsp";
+            return "redirect:/login";
         }
 
         if(id != null){
@@ -51,7 +50,7 @@ public class IncidenteController{
             @RequestParam("id")int id,
             @SessionAttribute(value = "usuarioLogado", required = false) Usuario usuarioLogado){
         if(usuarioLogado == null){
-            return "redirect:/login.jsp";
+            return "redirect:/login";
         }
         service.excluir(id);
         return "redirect:/incidente/listar";
@@ -63,7 +62,7 @@ public class IncidenteController{
             @SessionAttribute(value = "usuarioLogado", required = false) Usuario usuarioLogado,
             Model model){
         if (usuarioLogado == null){
-            return "redirect:/login.jsp";
+            return "redirect:/login";
         }
         Incidente incidente = service.buscarPorCodigo(id);
         if(incidente != null){
@@ -78,7 +77,7 @@ public class IncidenteController{
             Incidente incidente, @SessionAttribute(value = "usuarioLogado", required = false) Usuario usuarioLogado,
             Model model){
         if(usuarioLogado == null) {
-            return "redirect:/login.jsp";
+            return "redirect:/login";
         }
         incidente.setUsuarioId(usuarioLogado.getCodigo());
 
@@ -88,8 +87,6 @@ public class IncidenteController{
         boolean sucesso = service.salvar(incidente);
 
         if(sucesso){
-
-            GerenciadorLogs.registrar("Incidente '" +incidente.getTitulo() + "' foi salvo pelo usuario de ID: " + usuarioLogado.getCodigo());
             return "redirect:/incidente/listar";
         }else{
             model.addAttribute("incidente", incidente);

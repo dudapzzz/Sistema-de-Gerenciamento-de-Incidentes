@@ -13,7 +13,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>${not empty incidente.codigo ? 'Editar' : 'Novo'} Incidente</title>
-    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/style.css?v=2">
+    <link rel="stylesheet" type="text/css" href="/style.css?v=2">
 
 </head>
 
@@ -28,7 +28,7 @@
                     <div class="avatar" aria-label="Menu do usuário"></div>
                 </summary>
                 <div class="user-dropdown">
-                    <a href="logout">Sair da conta</a>
+                    <a href="/logout">Sair da conta</a>
                 </div>
             </details>
         </div>
@@ -36,12 +36,12 @@
     <div class="body form-layout">
         <aside class="sidebar">
             <nav class="nav">
-                <a href="inicio">Início</a>
-                <a href="incidente?acao=form" class="active">Registrar Incidente</a>
-                <a href="incidente?acao=listar">Visualizar Incidentes</a>
-                <a href="relatorios">Relatórios</a>
-                <a href="ativo?acao=listar">Dispositivos Monitorados</a>
-                <a href="ativo?acao=form">Registrar Dispositivos</a>
+                <a href="/inicio">Início</a>
+                <a href="/incidente/form" class="active">Registrar Incidente</a>
+                <a href="/incidente/listar">Visualizar Incidentes</a>
+                <a href="/relatorios">Relatórios</a>
+                <a href="/ativo/listar">Dispositivos Monitorados</a>
+                <a href="/ativo/form">Registrar Dispositivos</a>
             </nav>
         </aside>
 
@@ -55,7 +55,7 @@
             </c:if>
 
             <div class="form-container">
-                <form action="incidente" method="POST">
+                <form action="/incidente/salvar" method="POST">
 
                     <input type="hidden" name="acao" value="salvar" />
 
@@ -105,7 +105,7 @@
 
                     <div class="form-actions">
                         <button type="submit" class="btn btn-success">Salvar</button>
-                        <a href="inicio" class="btn btn-cancel">Cancelar</a>
+                        <a href="/inicio" class="btn btn-cancel">Cancelar</a>
                     </div>
                 </form>
             </div>

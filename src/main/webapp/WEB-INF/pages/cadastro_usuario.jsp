@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Cadastro - Sistema de Incidentes</title>
-    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" type="text/css" href="/style.css">
 </head>
 <body class="auth-page">
 
@@ -22,7 +22,7 @@
             </div>
         </c:if>
 
-        <form action="cadastro_usuario" method="post">
+        <form action="/cadastro_usuario" method="post">
 
             <div class="input-group">
                 <label for="nome">Nome Completo</label>
@@ -43,8 +43,8 @@
         </form>
 
         <div class="auth-footer">
-            <p>Já tem uma conta? <a href="login.jsp">Faça login aqui</a></p>
-            <a href="index.jsp" class="back-link">← Voltar ao início</a>
+            <p>Já tem uma conta? <a href="/login">Faça login aqui</a></p>
+            <a href="/" class="back-link">← Voltar ao início</a>
         </div>
     </div>
 </div>

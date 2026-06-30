@@ -6,7 +6,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dispositivos - Sistema de Incidentes</title>
-    <link rel="stylesheet" type="text/css" href="style.css?v=4">
+    <link rel="stylesheet" type="text/css" href="/style.css?v=4">
 </head>
 <body>
 <div class="app">
@@ -19,7 +19,7 @@
                     <div class="avatar"></div>
                 </summary>
                 <div class="user-dropdown">
-                    <a href="logout">Sair da conta</a>
+                    <a href="/logout">Sair da conta</a>
                 </div>
             </details>
         </div>
@@ -28,19 +28,19 @@
     <div class="body">
         <aside class="sidebar">
             <nav class="nav">
-                <a href="inicio">Início</a>
-                <a href="incidente?acao=form">Registrar Incidente</a>
-                <a href="incidente?acao=listar">Visualizar Incidentes</a>
-                <a href="relatorios">Relatórios</a>
-                <a href="ativo?acao=listar"class="active">Dispositivos Monitorados</a>
-                <a href="ativo?acao=form">Registrar Dispositivos</a>
+                <a href="/inicio">Início</a>
+                <a href="/incidente/form">Registrar Incidente</a>
+                <a href="/incidente/listar">Visualizar Incidentes</a>
+                <a href="/relatorios">Relatórios</a>
+                <a href="/ativo/listar"class="active">Dispositivos Monitorados</a>
+                <a href="/ativo/form">Registrar Dispositivos</a>
             </nav>
         </aside>
 
         <main class="main">
             <div class="section-head">
                 <h1>Dispositivos</h1>
-                <a href="ativo?acao=form" class="btn btn-success" style="text-decoration: none;">+ Novo Ativo</a>
+                <a href="/ativo/form" class="btn btn-success" style="text-decoration: none;">+ Novo Ativo</a>
             </div>
 
             <div class="table-wrap">
@@ -68,8 +68,8 @@
                                 </span>
                             </td>
                             <td>
-                                <a href="ativo?acao=form&id=${ativo.id}" class="btn-action btn-details">Editar</a>
-                                <a href="ativo?acao=excluir&id=${ativo.id}" class="btn-action btn-details" style="color: var(--danger);" onclick="return confirm('Excluir este ativo?');">Excluir</a>
+                                <a href="/ativo/editar?id=${ativo.id}" class="btn-action btn-details">Editar</a>
+                                <a href="/ativo/excluir?id=${ativo.id}" class="btn-action btn-details" style="color: var(--danger);" onclick="return confirm('Excluir este ativo?');">Excluir</a>
                             </td>
                         </tr>
                     </c:forEach>

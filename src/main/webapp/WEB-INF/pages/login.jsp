@@ -14,7 +14,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Login - Sistema de Incidentes</title>
-    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" type="text/css" href="/style.css">
 </head>
 
 <body class="auth-page">
@@ -37,7 +37,7 @@
                 </div>
             </c:if>
 
-            <form action="login" method="post">
+            <form action="/login" method="post">
                 <div class="input-group">
                     <label for="email">E-mail</label>
                     <input type="email" id="email" name="email" required placeholder="seu@email.com">
@@ -53,8 +53,8 @@
             </form>
 
             <div class="auth-footer">
-                <p>Não tem uma conta? <a href="cadastro_usuario">Cadastre-se</a> </p>
-                <a href="index.jsp" class="back-link"> Voltar</a>
+                <p>Não tem uma conta? <a href="/cadastro_usuario">Cadastre-se</a> </p>
+                <a href="/" class="back-link"> Voltar</a>
             </div>
         </div>
     </div>

@@ -5,15 +5,15 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>4.1.0</version>
+    <version>4.0.6</version>
     <relativePath/> <!-- lookup parent from repository -->
   </parent>
-  <groupId>org.gestaomvc</groupId>
-  <artifactId>gestao-produtos-mvc</artifactId>
+  <groupId>br.csi.appspring</groupId>
+  <artifactId>app_spring_mvc</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-
-  <name>gestao-produtos-mvc</name>
-  <description>gestao-produtos-mvc</description>
+  <packaging>war</packaging>
+  <name>app_spring_mvc</name>
+  <description>app_spring_mvc</description>
   <url/>
   <licenses>
     <license/>
@@ -29,13 +29,12 @@
   </scm>
   <properties>
     <java.version>17</java.version>
-    <maven.compiler.source>21</maven.compiler.source>
-    <maven.compiler.target>21</maven.compiler.target>
   </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-webmvc</artifactId>
+      <artifactId>spring-boot-starter-web</artifactId>
     </dependency>
 
     <dependency>
@@ -46,30 +45,12 @@
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-tomcat</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-webmvc-test</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.apache.tomcat.embed</groupId>
-      <artifactId>tomcat-embed-jasper</artifactId>
-    </dependency>
-    <dependency>
       <groupId>jakarta.servlet.jsp.jstl</groupId>
       <artifactId>jakarta.servlet.jsp.jstl-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.glassfish.web</groupId>
-      <artifactId>jakarta.servlet.jsp.jstl</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.postgresql</groupId>
-      <artifactId>postgresql</artifactId>
-      <scope>runtime</scope>
     </dependency>
 
     <dependency>
@@ -78,9 +59,19 @@
     </dependency>
 
     <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.apache.tomcat.embed</groupId>
       <artifactId>tomcat-embed-jasper</artifactId>
-      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.glassfish.web</groupId>
+      <artifactId>jakarta.servlet.jsp.jstl</artifactId>
     </dependency>
 
   </dependencies>

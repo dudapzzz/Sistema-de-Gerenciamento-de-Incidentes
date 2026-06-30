@@ -17,8 +17,13 @@ public class PaginaInicialController {
         this.service= service;
     }
 
+    @GetMapping("/")
+    public String exibirIndex() {
+        return "forward:/index.jsp";
+    }
+
     //mepeia as url's para disparar esse metodo quando acessados
-    @GetMapping({"/pagina_inicial", "/inicio", "/"})
+    @GetMapping({"/pagina_inicial", "/inicio"})
     public String exibirPaginaInicial(
             @SessionAttribute(value = "usuarioLogado", required = false) Usuario usuarioLogado, Model model) {
 
