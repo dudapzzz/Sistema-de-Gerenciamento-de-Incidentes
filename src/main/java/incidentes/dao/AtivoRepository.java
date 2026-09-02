@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface AtivoDAO extends JpaRepository<Ativo, Integer> {
+public interface AtivoRepository extends JpaRepository<Ativo, Integer> {
     List<Ativo> findByUsuarioIdOrderByIdDesc(int usuarioId);
 }

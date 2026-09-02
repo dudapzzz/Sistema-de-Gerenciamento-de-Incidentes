@@ -1,6 +1,6 @@
 package incidentes.service;
 
-import incidentes.dao.IncidenteDAO;
+import incidentes.dao.IncidenteRepository;
 import incidentes.model.Incidente;
 import org.springframework.stereotype.Service;
 
@@ -11,21 +11,21 @@ import java.util.Optional;
 
 @Service
 public class IncidenteService {
-    private final IncidenteDAO dao;
+    private final IncidenteRepository dao;
 
-    public IncidenteService(IncidenteDAO dao) {
+    public IncidenteService(IncidenteRepository dao) {
         this.dao = dao;
     }
 
-    public boolean salvar(Incidente inc) {
+    public Incidente salvar(Incidente inc) {
         if (inc.getTitulo() == null || inc.getTitulo().trim().length() < 5) {
-            return false;
+            throw new IllegalArgumentException("O titulo deve ter pelo menos 5 caracteres");
         }
         if (inc.getDescricao() == null || inc.getDescricao().trim().length() < 10) {
-            return false;
+            throw new IllegalArgumentException("A descricao deve ter pelo menos 10 caracteres");
         }
         if (inc.getResponsavel() == null || inc.getResponsavel().trim().isEmpty()) {
-            return false;
+            throw new IllegalArgumentException("O responsavel e obrigatorio");
         }
         if (inc.getCodigo() != 0) {
             Optional<Incidente> incidenteOriginal = dao.findById(inc.getCodigo());
@@ -35,15 +35,14 @@ public class IncidenteService {
             }
         } else {
             if (inc.getUsuarioId() <= 0) {
-                return false;
+                throw new IllegalArgumentException("O usuario do incidente e obrigatorio");
             }
         }
         inc.setTitulo(inc.getTitulo().trim());
         inc.setResponsavel(inc.getResponsavel().trim());
         inc.setDescricao(inc.getDescricao().trim());
 
-        dao.save(inc);
-        return true;
+        return dao.save(inc);
     }
 
 

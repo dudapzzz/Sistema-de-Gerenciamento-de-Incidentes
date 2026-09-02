@@ -1,6 +1,6 @@
 package incidentes.service;
 
-import incidentes.dao.AtivoDAO;
+import incidentes.dao.AtivoRepository;
 import incidentes.model.Ativo;
 import org.springframework.stereotype.Service;
 
@@ -9,9 +9,9 @@ import java.util.List;
 @Service
 public class AtivoService {
 
-    private final AtivoDAO dao;
+    private final AtivoRepository dao;
 
-    public AtivoService(AtivoDAO dao) {
+    public AtivoService(AtivoRepository dao) {
         this.dao = dao;
     }
 
@@ -23,15 +23,15 @@ public class AtivoService {
         return dao.findById(id).orElse(null);
     }
 
-    public boolean salvar(Ativo ativo) {
+    public Ativo salvar(Ativo ativo) {
         if (ativo.getNome() == null || ativo.getNome().trim().isEmpty()) {
-            return false;
+            throw new IllegalArgumentException("O nome do ativo é obrigatorio");
         }
         if (ativo.getTipo() == null || ativo.getTipo().trim().isEmpty()) {
-            return false;
+            throw new IllegalArgumentException("O tipo do ativo é obrigatorio");
         }
         if (ativo.getUsuarioId() <= 0) {
-            return false;
+            throw new IllegalArgumentException("O usuario do ativo é obrigatorio");
         }
 
         ativo.setNome(ativo.getNome().trim());
@@ -40,9 +40,7 @@ public class AtivoService {
         if (ativo.getIpOuUrl() != null) {
             ativo.setIpOuUrl(ativo.getIpOuUrl().trim());
         }
-
-        dao.save(ativo);
-        return true;
+        return dao.save(ativo);
     }
 
     public boolean excluir(int id) {

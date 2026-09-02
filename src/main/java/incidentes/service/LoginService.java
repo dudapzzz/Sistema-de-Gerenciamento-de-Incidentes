@@ -1,6 +1,6 @@
 package incidentes.service;
 
-import incidentes.dao.UsuarioDAO;
+import incidentes.dao.UsuarioRepository;
 import incidentes.model.Usuario;
 import org.springframework.stereotype.Service;
 
@@ -8,8 +8,8 @@ import java.util.Optional;
 
 @Service
 public class LoginService {
-    private final UsuarioDAO dao;
-    public LoginService(UsuarioDAO dao){
+    private final UsuarioRepository dao;
+    public LoginService(UsuarioRepository dao){
         this.dao = dao;
     }
     public Usuario autenticar(String email, String senha){

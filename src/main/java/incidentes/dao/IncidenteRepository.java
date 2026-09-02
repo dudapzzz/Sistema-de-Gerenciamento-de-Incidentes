@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface IncidenteDAO extends JpaRepository<Incidente, Integer> {
+public interface IncidenteRepository extends JpaRepository<Incidente, Integer> {
     List<Incidente> findByUsuarioIdOrderByCodigoDesc(int usuarioId);
     List <Incidente> findTop3ByUsuarioIdOrderByCodigoDesc(int usuarioId);
 
