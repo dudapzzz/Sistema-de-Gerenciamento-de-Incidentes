@@ -1,27 +1,53 @@
 package incidentes.model;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.util.Date;
+import java.util.UUID;
 
 @Entity
 @Table(name = "incidente")
+@Schema(description = "Entidade que representa um incidente identificado")
 
 public class Incidente{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(description = "Código identificador do incidente", example = "01")
     private int codigo;
+
+    @UuidGenerator
+    @Column(unique = true, updatable = false)
+    @Schema(description = "UUID público do incidente",example = "conjunto aletório de números e letras")
+    private UUID uuid;
+
+    @Column(nullable = false)
+    @Schema(description = "Título do incidente", example = "Vazamento de senha")
     private String titulo;
+
+    @Column(nullable = false)
+    @Schema(description = "Descrição do incidente", example = "Fui informado que houve um acesso ao sistema da empresa em um local desconhecido")
     private String descricao;
+
+    @Column(nullable = false)
+    @Schema(description = "Grau de relevância do incidente", example = "Alto")
     private String relevancia;
 
     @Column(name = "data_incidente")
+    @Schema(description = "Data do registro do incidente")
     private Date dataIncidente;
-    private String status;
-    @Column(name = "usuario_id")
-    private int usuarioId;
 
+    @Column(nullable = false)
+    @Schema(description = "Status da resolução do incidente", example = "Em andamento")
+    private String status;
+
+    @Schema(description = "Responsável pela resolução do incidente", example = "Carlos")
     private String responsavel;
+
+    @Column(name = "usuario_id", nullable = false)
+    @Schema(description = "ID do usuário que registrou o incidente", example = "01")
+    private int usuarioId;
 
     public Incidente(){
         this.dataIncidente = new Date();

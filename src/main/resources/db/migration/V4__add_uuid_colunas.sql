@@ -1,0 +1,8 @@
+ALTER TABLE usuario
+ADD COLUMN uuid UUID DEFAULT gen_random_uuid() NOT NULL UNIQUE;
+
+ALTER TABLE ativo
+ADD COLUMN uuid UUID DEFAULT gen_random_uuid() NOT NULL UNIQUE;
+
+ALTER TABLE incidente
+ADD COLUMN uuid UUID DEFAULT gen_random_uuid() NOT NULL UNIQUE;

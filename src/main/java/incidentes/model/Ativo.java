@@ -1,6 +1,10 @@
 package incidentes.model;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
+import org.hibernate.annotations.UuidGenerator;
+
+import java.util.UUID;
 
 @Entity
 @Table(name= "ativo")
@@ -9,14 +13,31 @@ public class Ativo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
+    @UuidGenerator
+    @Column(unique = true, updatable = false)
+    @Schema(description = "UUID público do ativo")
+    private UUID uuid;
+
+    @Column(nullable = false)
+    @Schema(description = "Nome do ativo", example = "Servidor Principal")
     private String nome;
+
+    @Column(nullable = false)
+    @Schema(description = "Tipo do ativo", example = "Servidor")
     private String tipo;
 
     @Column(name = "ip_ou_url")
+    @Schema(description = "IP ou URL do ativo", example = "192.168.1.10")
     private String ipOuUrl;
+
+    @Column(nullable = false)
+    @Schema(description = "Nível de criticidade", example = "Alta")
     private String criticidade;
 
-    @Column(name = "usuario_id")
+
+    @Column(name = "usuario_id", nullable = false)
+    @Schema(description = "ID do usuário responsável", example = "1")
     private int usuarioId;
 
     public int getId() {
