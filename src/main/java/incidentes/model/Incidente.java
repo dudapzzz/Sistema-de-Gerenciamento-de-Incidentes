@@ -117,4 +117,9 @@ public class Incidente{
     public void setUsuarioId(int usuarioId) {
         this.usuarioId = usuarioId;
     }
+
+    public UUID getUuid() {return uuid;}
+
+    public void setUuid(UUID uuid) {this.uuid = uuid;}
 }
+

@@ -4,7 +4,10 @@ import incidentes.dao.UsuarioRepository;
 import incidentes.model.Usuario;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UsuarioService {
@@ -13,6 +16,16 @@ public class UsuarioService {
 
     public UsuarioService(UsuarioRepository repository) {
         this.repository = repository;
+    }
+
+    public List<Usuario> getUsuarios() {
+        return repository.findAll();
+    }
+
+    public Usuario getUsuarioByUuid(String uuidStr) {
+        UUID uuid = UUID.fromString(uuidStr);
+        return repository.findByUuid(uuid)
+                .orElseThrow(() -> new NoSuchElementException("Usuário não encontrado para o UUID: " + uuidStr));
     }
 
     public Usuario inserir(Usuario u) {

@@ -4,10 +4,7 @@ import incidentes.dao.IncidenteRepository;
 import incidentes.model.Incidente;
 import org.springframework.stereotype.Service;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class IncidenteService {
@@ -15,6 +12,15 @@ public class IncidenteService {
 
     public IncidenteService(IncidenteRepository dao) {
         this.dao = dao;
+    }
+
+    public List<Incidente> getIncidentes(){
+        return dao.findAll();
+    }
+
+    public Incidente getIncidenteByUuid(String uuidStr){
+        UUID uuid = UUID.fromString(uuidStr);
+        return dao.findByUuid(uuid).orElseThrow(() -> new NoSuchElementException("Incidente não encontrado para o UUID: " + uuidStr));
     }
 
     public Incidente salvar(Incidente inc) {
@@ -43,6 +49,24 @@ public class IncidenteService {
         inc.setDescricao(inc.getDescricao().trim());
 
         return dao.save(inc);
+    }
+
+    public Incidente updateIncidenteByUuid(Incidente inc){
+        if(inc.getUuid() == null){
+            throw new IllegalArgumentException("UUID é obrigatorio");
+        }
+
+        Incidente existente= getIncidenteByUuid(inc.getUuid().toString());
+        inc.setCodigo(existente.getCodigo());
+        inc.setUuid(existente.getUuid());
+
+        return dao.save(inc);
+    }
+
+    public boolean excluirPorUuid(String uuidStr) {
+        Incidente inc = getIncidenteByUuid(uuidStr);
+        dao.delete(inc);
+        return true;
     }
 
 

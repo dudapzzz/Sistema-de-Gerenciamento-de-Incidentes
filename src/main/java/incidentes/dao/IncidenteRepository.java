@@ -7,9 +7,14 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public interface IncidenteRepository extends JpaRepository<Incidente, Integer> {
+
+    Optional<Incidente> findByUuid(UUID uuid);
+
     List<Incidente> findByUsuarioIdOrderByCodigoDesc(int usuarioId);
     List <Incidente> findTop3ByUsuarioIdOrderByCodigoDesc(int usuarioId);
 

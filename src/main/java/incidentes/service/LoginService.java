@@ -4,7 +4,9 @@ import incidentes.dao.UsuarioRepository;
 import incidentes.model.Usuario;
 import org.springframework.stereotype.Service;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class LoginService {
@@ -12,6 +14,7 @@ public class LoginService {
     public LoginService(UsuarioRepository dao){
         this.dao = dao;
     }
+
     public Usuario autenticar(String email, String senha){
         if(email == null || senha == null){
             return null;
@@ -30,5 +33,11 @@ public class LoginService {
             return null;
         }
         return usuario;
+    }
+
+    public Usuario getUsuarioByUuid(String uuidStr){
+        UUID uuid = UUID.fromString(uuidStr);
+        return dao.findByUuid(uuid)
+                .orElseThrow(() -> new NoSuchElementException("Usuário não encontrado para o UUID: " + uuidStr));
     }
 }
