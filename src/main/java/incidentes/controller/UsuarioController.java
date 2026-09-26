@@ -1,69 +1,64 @@
 package incidentes.controller;
 
 import incidentes.model.Usuario;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
 import incidentes.service.UsuarioService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
-@Controller
+import java.net.URI;
+import java.util.List;
+
+@RestController
+@RequestMapping("/usuarios")
+@Tag(name = "Usuários", description = "Rotas para gerenciamento dos usuários")
 public class UsuarioController {
+
     private final UsuarioService usuarioService;
 
-    public UsuarioController(UsuarioService usuarioService){
-        this.usuarioService= usuarioService;
+    public UsuarioController(UsuarioService usuarioService) {
+        this.usuarioService = usuarioService;
     }
 
-    @GetMapping("/cadastro_usuario")
-    public String exibirFormulario(){
-        return "cadastro_usuario";
+    @GetMapping
+    @Operation(summary = "Listar todos os usuários")
+    public List<Usuario> listar() {
+        return this.usuarioService.getUsuarios();
     }
 
-    @PostMapping("/cadastro_usuario")
-    public String cadastrarUsuario(Usuario novoUsuario, Model model){
-        try {
-            usuarioService.inserir(novoUsuario);
-            return "redirect:/login?msg=sucesso";
-        } catch (IllegalArgumentException e) {
-            model.addAttribute("erro", e.getMessage());
-            return "cadastro_usuario";
-        }
+    @GetMapping("/uuid/{uuid}")
+    @Operation(summary = "Buscar usuário por UUID")
+    public ResponseEntity<Usuario> getUsuarioByUuid(@PathVariable String uuid) {
+        return ResponseEntity.ok(this.usuarioService.getUsuarioUUID(uuid));
     }
 
-    @PostMapping("/usuarios")
-    @ResponseBody
-    public ResponseEntity<?> cadastrar(@RequestBody Usuario novoUsuario){
-        try{
-            Usuario usuarioSalvo= usuarioService.inserir(novoUsuario);
-            return ResponseEntity.status(HttpStatus.CREATED).body(usuarioSalvo); //201
-        } catch (IllegalArgumentException e){
-            return ResponseEntity.badRequest().body(e.getMessage()); //400
-        }
+    @PostMapping
+    @Operation(summary = "Criar um novo usuário")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Usuário criado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos")
+    })
+    public ResponseEntity<Usuario> salvar(@RequestBody @Valid Usuario usuario, UriComponentsBuilder uriBuilder) {
+        Usuario usuarioSalvo = this.usuarioService.inserir(usuario);
+        URI uri = uriBuilder.path("/usuarios/uuid/{uuid}").buildAndExpand(usuarioSalvo.getUuid()).toUri();
+        return ResponseEntity.created(uri).body(usuarioSalvo);
     }
 
-    @PostMapping("/usuarios/login")
-    @ResponseBody
-    public ResponseEntity<?> login(@RequestParam String email, @RequestParam String senha){
-        try{
-            Usuario usuario = usuarioService.autenticar(email,senha);
-            if(usuario== null){
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("E-mail ou senha inválidos"); //401
-            }
-            return ResponseEntity.ok(usuario); //200
-        }catch (IllegalArgumentException e){
-            return ResponseEntity.badRequest().body(e.getMessage()); //400
-        }
+    @PutMapping("/uuid")
+    @Operation(summary = "Atualizar um usuário")
+    public ResponseEntity<Usuario> atualizarUUID(@RequestBody @Valid Usuario usuario) {
+        return ResponseEntity.ok(this.usuarioService.atualizarUUID(usuario));
     }
 
-    @GetMapping("/usuarios/{id}")
-    @ResponseBody
-    public ResponseEntity<Usuario> buscarPorId(@PathVariable int id){
-        Usuario usuario= usuarioService.buscarPorId(id);
-        if(usuario == null){
-            return ResponseEntity.notFound().build();//404
-        }
-        return ResponseEntity.ok(usuario); //200
+    @DeleteMapping("/uuid/{uuid}")
+    @Operation(summary = "Deletar usuário por UUID")
+    public ResponseEntity<?> deletarUUID(@PathVariable String uuid) {
+        this.usuarioService.deletarUUID(uuid);
+        return ResponseEntity.noContent().build();
     }
 }

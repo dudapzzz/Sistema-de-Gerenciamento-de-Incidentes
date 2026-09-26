@@ -1,5 +1,7 @@
 package incidentes.model;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import org.hibernate.annotations.UuidGenerator;
@@ -8,6 +10,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name= "ativo")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Ativo {
 
     @Id
@@ -36,9 +39,10 @@ public class Ativo {
     private String criticidade;
 
 
-    @Column(name = "usuario_id", nullable = false)
-    @Schema(description = "ID do usuário responsável", example = "1")
-    private int usuarioId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "usuario_id", nullable = false)
+    @Schema(description = "Usuário responsável pelo ativo")
+    private Usuario usuario;
 
     public int getId() {
         return id;
@@ -84,11 +88,11 @@ public class Ativo {
         this.criticidade = criticidade;
     }
 
-    public int getUsuarioId() {
-        return usuarioId;
+    public Usuario getUsuario() {
+        return usuario;
     }
 
-    public void setUsuarioId(int usuarioId) {
-        this.usuarioId = usuarioId;
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
     }
 }

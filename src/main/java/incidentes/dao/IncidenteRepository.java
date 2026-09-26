@@ -15,15 +15,15 @@ public interface IncidenteRepository extends JpaRepository<Incidente, Integer> {
 
     Optional<Incidente> findByUuid(UUID uuid);
 
-    List<Incidente> findByUsuarioIdOrderByCodigoDesc(int usuarioId);
-    List <Incidente> findTop3ByUsuarioIdOrderByCodigoDesc(int usuarioId);
+    List<Incidente> findByUsuario_CodigoOrderByCodigoDesc(int usuarioId);
+    List <Incidente> findTop3ByUsuario_CodigoOrderByCodigoDesc(int usuarioId);
 
-    long countByStatusIgnoreCaseAndUsuarioId(String status, int usuarioId);
-    long countByRelevanciaIgnoreCaseAndUsuarioId(String relevancia, int usuarioId);
+    long countByStatusIgnoreCaseAndUsuario_Codigo(String status, int usuarioId);
+    long countByRelevanciaIgnoreCaseAndUsuario_Codigo(String relevancia, int usuarioId);
 
-    @Query("SELECT i.status, COUNT(i) FROM Incidente i WHERE i.usuarioId = :usuarioId GROUP BY i.status")
+    @Query("SELECT i.status, COUNT(i) FROM Incidente i WHERE i.usuario.codigo = :usuarioId GROUP BY i.status")
     List<Object[]> getEstatisticasStatusRaw(@Param("usuarioId") int usuarioId);
 
-    @Query("SELECT i.relevancia, COUNT(i) FROM Incidente i WHERE i.usuarioId = :usuarioId GROUP BY i.relevancia")
+    @Query("SELECT i.relevancia, COUNT(i) FROM Incidente i WHERE i.usuario.codigo = :usuarioId GROUP BY i.relevancia")
     List<Object[]> getEstatisticasRelevanciaRaw(@Param("usuarioId") int usuarioId);
 }

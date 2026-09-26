@@ -1,52 +1,54 @@
 package incidentes.controller;
 
-import incidentes.model.Usuario;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttribute;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import incidentes.service.IncidenteService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
 
-@Controller
+@RestController
 @RequestMapping("/relatorios")
-public class RelatorioController{
+@Tag(name = "Relatórios", description = "Endpoints para geração de dados estatísticos e relatórios")
+public class RelatorioController {
 
     private final IncidenteService service;
 
-    public RelatorioController(IncidenteService service){
+    public RelatorioController(IncidenteService service) {
         this.service = service;
     }
 
-    @GetMapping
-    public String gerarRelatorio(@RequestParam(value = "tipo", required = false) String tipo,
-                                 @SessionAttribute(value = "usuarioLogado", required = false) Usuario usuarioLogado,
-                                 Model model){
-        if(usuarioLogado == null){
-            return "redirect:/login";
-        }
-        int idLogado= usuarioLogado.getCodigo();
+    @GetMapping("/usuario/{usuarioId}")
+    @Operation(summary = "Gerar dados do relatório por usuário", description = "Retorna o consolidado estatístico de incidentes para exibição de relatórios")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Dados do relatório gerados com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Requisição inválida")
+    })
+    public ResponseEntity<Map<String, Object>> gerarRelatorio(
+            @PathVariable int usuarioId,
+            @RequestParam(value = "tipo", required = false) String tipo) {
 
-        long naoResolvidos = service.contarNaoResolvidos(idLogado);
-        long resolvidos = service.contarResolvidos(idLogado);
-        long altaRelevancia = service.contarAltaRelevancia(idLogado);
+        long naoResolvidos = service.contarNaoResolvidos(usuarioId);
+        long resolvidos = service.contarResolvidos(usuarioId);
+        long altaRelevancia = service.contarAltaRelevancia(usuarioId);
 
-        Map<String, Integer> estatisticasStatus = service.contarIncidentesPorStatus(idLogado);
-        Map<String, Integer> estatisticasRelevancia = service.contarIncidentesPorRelevancia(idLogado);
-        int totalIncidentes= service.listarTodos(idLogado).size();
+        Map<String, Integer> estatisticasStatus = service.contarIncidentesPorStatus(usuarioId);
+        Map<String, Integer> estatisticasRelevancia = service.contarIncidentesPorRelevancia(usuarioId);
+        int totalIncidentes = service.listarTodos(usuarioId).size();
 
-        //passa dados do controller para as interfaces
-        model.addAttribute("tipoRelatorio", tipo);
-        model.addAttribute("qtdNaoResolvidos", naoResolvidos);
-        model.addAttribute("qtdResolvidos", resolvidos);
-        model.addAttribute("qtdAltaRelevancia", altaRelevancia);
-        model.addAttribute("mapStatus", estatisticasStatus);
-        model.addAttribute("mapRelevancia", estatisticasRelevancia);
-        model.addAttribute("totalIncidentes", totalIncidentes);
+        Map<String, Object> relatorio = new HashMap<>();
+        relatorio.put("tipoRelatorio", tipo);
+        relatorio.put("qtdNaoResolvidos", naoResolvidos);
+        relatorio.put("qtdResolvidos", resolvidos);
+        relatorio.put("qtdAltaRelevancia", altaRelevancia);
+        relatorio.put("mapStatus", estatisticasStatus);
+        relatorio.put("mapRelevancia", estatisticasRelevancia);
+        relatorio.put("totalIncidentes", totalIncidentes);
 
-        return "relatorios";
+        return ResponseEntity.ok(relatorio);
     }
 }

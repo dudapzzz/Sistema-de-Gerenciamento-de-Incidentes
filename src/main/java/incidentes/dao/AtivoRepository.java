@@ -11,5 +11,5 @@ import java.util.UUID;
 @Repository
 public interface AtivoRepository extends JpaRepository<Ativo, Integer> {
     Optional<Ativo> findByUuid(UUID uuid);
-    List<Ativo> findByUsuarioIdOrderByIdDesc(int usuarioId);
+    List<Ativo> findByUsuarioUuidOrderByIdDesc(UUID usuarioUuid);
 }

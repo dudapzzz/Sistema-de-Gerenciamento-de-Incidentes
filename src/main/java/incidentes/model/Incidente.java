@@ -1,5 +1,7 @@
 package incidentes.model;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import org.hibernate.annotations.UuidGenerator;
@@ -9,6 +11,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "incidente")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "codigo")
 @Schema(description = "Entidade que representa um incidente identificado")
 
 public class Incidente{
@@ -19,7 +22,10 @@ public class Incidente{
 
     @UuidGenerator
     @Column(unique = true, updatable = false)
-    @Schema(description = "UUID público do incidente",example = "conjunto aletório de números e letras")
+    @Schema(
+            description = "UUID público do incidente",
+            example = "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+    )
     private UUID uuid;
 
     @Column(nullable = false)
@@ -45,9 +51,10 @@ public class Incidente{
     @Schema(description = "Responsável pela resolução do incidente", example = "Carlos")
     private String responsavel;
 
-    @Column(name = "usuario_id", nullable = false)
-    @Schema(description = "ID do usuário que registrou o incidente", example = "01")
-    private int usuarioId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "usuario_id", nullable = false)
+    @Schema(description = "Usuário que registrou o incidente")
+    private Usuario usuario;
 
     public Incidente(){
         this.dataIncidente = new Date();
@@ -110,12 +117,12 @@ public class Incidente{
         this.status = status;
     }
 
-    public int getUsuarioId() {
-        return usuarioId;
+    public Usuario getUsuario() {
+        return usuario;
     }
 
-    public void setUsuarioId(int usuarioId) {
-        this.usuarioId = usuarioId;
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
     }
 
     public UUID getUuid() {return uuid;}

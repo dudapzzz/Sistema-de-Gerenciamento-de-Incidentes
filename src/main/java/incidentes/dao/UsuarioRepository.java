@@ -1,6 +1,7 @@
 package incidentes.dao;
 
 import incidentes.model.Usuario;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -12,5 +13,10 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
 
     Optional<Usuario> findByUuid(UUID uuid);
 
+    void deleteByUuid(UUID uuid);
+
+    boolean existsByUuid(UUID uuid);
+
     Optional<Usuario> findByEmailAndSenha(String email, String senha);
 }
+

@@ -1,59 +1,58 @@
 package incidentes.service;
 
 import incidentes.dao.AtivoRepository;
+import incidentes.dao.UsuarioRepository;
 import incidentes.model.Ativo;
+import incidentes.model.Usuario;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
-import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 
 @Service
 public class AtivoService {
 
     private final AtivoRepository dao;
+    private final UsuarioRepository usuarioRepository;
 
-    public AtivoService(AtivoRepository dao) {
+    public AtivoService(AtivoRepository dao, UsuarioRepository usuarioRepository) {
         this.dao = dao;
+        this.usuarioRepository = usuarioRepository;
     }
 
     public List<Ativo> getAtivos() {
         return dao.findAll();
     }
 
-    public List<Ativo> listarPorUsuario(int usuarioId) {
-        return dao.findByUsuarioIdOrderByIdDesc(usuarioId);
-    }
+    public List<Ativo> listarPorUsuarioUuid(String usuarioUuidStr) {
+        UUID uuidFormatado = UUID.fromString(usuarioUuidStr);
 
+        if (!usuarioRepository.existsByUuid(uuidFormatado)) {
+            throw new NoSuchElementException("Usuário não encontrado para o UUID: " + usuarioUuidStr);
+        }
+
+        return dao.findByUsuarioUuidOrderByIdDesc(uuidFormatado);
+    }
     public Ativo getAtivoByUuid(String uuidStr) {
         UUID uuid = UUID.fromString(uuidStr);
         return dao.findByUuid(uuid).orElseThrow(() -> new NoSuchElementException("Ativo nao encontrado para o uuid: " +uuidStr));
     }
 
-    public Ativo saveAtivo(Ativo ativo)
-    {
-        if(ativo.getNome() == null || ativo.getNome().trim().isEmpty()){
-            throw new IllegalArgumentException("O nome do ativo é obrigatório");
-        }
-        if(ativo.getTipo() == null || ativo.getTipo().trim().isEmpty()){
-            throw new IllegalArgumentException("o tipo do ativo é obrigatório");
-        }
-        if (ativo.getUsuarioId() <= 0) {
-            throw new IllegalArgumentException("O usuário do ativo é obrigatório");
+    public Ativo saveAtivo(Ativo ativo) {
+        if (ativo.getUsuario() != null && ativo.getUsuario().getUuid() != null) {
+            Usuario usuario = usuarioRepository.findByUuid(ativo.getUsuario().getUuid())
+                    .orElseThrow(() -> new NoSuchElementException("Usuário informado para o ativo não foi encontrado"));
+            ativo.setUsuario(usuario);
         }
 
-        ativo.setNome(ativo.getNome().trim());
-        ativo.setTipo(ativo.getTipo().trim());
-
-        if (ativo.getIpOuUrl() != null){
-            ativo.setIpOuUrl(ativo.getIpOuUrl().trim());
-        }
+        if (ativo.getNome() != null) ativo.setNome(ativo.getNome().trim());
+        if (ativo.getTipo() != null) ativo.setTipo(ativo.getTipo().trim());
+        if (ativo.getIpOuUrl() != null) ativo.setIpOuUrl(ativo.getIpOuUrl().trim());
 
         return dao.save(ativo);
     }
-
     public Ativo updateAtivoByUuid(Ativo ativo) {
         if (ativo.getUuid() == null) {
             throw new IllegalArgumentException("UUID é obrigatório para atualização");
@@ -62,6 +61,13 @@ public class AtivoService {
         Ativo ativoExistente = getAtivoByUuid(ativo.getUuid().toString());
         ativo.setId(ativoExistente.getId());
         ativo.setUuid(ativoExistente.getUuid());
+        if (ativo.getUsuario() == null) {
+            ativo.setUsuario(ativoExistente.getUsuario());
+        } else {
+            Usuario usuario = usuarioRepository.findById(ativo.getUsuario().getCodigo())
+                    .orElseThrow(() -> new NoSuchElementException("Usuário do ativo não encontrado"));
+            ativo.setUsuario(usuario);
+        }
 
         return dao.save(ativo);
     }

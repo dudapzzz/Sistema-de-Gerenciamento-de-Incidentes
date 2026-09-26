@@ -3,10 +3,10 @@ package incidentes.service;
 import incidentes.dao.UsuarioRepository;
 import incidentes.model.Usuario;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -18,42 +18,57 @@ public class UsuarioService {
         this.repository = repository;
     }
 
+    @Transactional(readOnly = true)
     public List<Usuario> getUsuarios() {
-        return repository.findAll();
+        return this.repository.findAll();
     }
 
-    public Usuario getUsuarioByUuid(String uuidStr) {
-        UUID uuid = UUID.fromString(uuidStr);
-        return repository.findByUuid(uuid)
-                .orElseThrow(() -> new NoSuchElementException("Usuário não encontrado para o UUID: " + uuidStr));
+    // Buscar por UUID (Converte a String recebida da Web)
+    @Transactional(readOnly = true)
+    public Usuario getUsuarioUUID(String uuid) {
+        UUID uuidFormatado = UUID.fromString(uuid);
+        return this.repository.findByUuid(uuidFormatado)
+                .orElseThrow(() -> new NoSuchElementException("Usuário não encontrado para o UUID: " + uuid));
     }
 
-    public Usuario inserir(Usuario u) {
-        if (u.getNome() == null || u.getNome().trim().isEmpty()) {
-            throw new IllegalArgumentException("O nome do usuário é obrigatório");
+    @Transactional
+    public Usuario inserir(Usuario usuario) {
+        if (usuario.getUuid() == null) {
+            usuario.setUuid(UUID.randomUUID());
         }
-        if (u.getEmail() == null || !u.getEmail().contains("@")) {
-           throw new IllegalArgumentException("O e-mail é obrigatório");
-        }
-        if (u.getSenha() == null || u.getSenha().length() < 6) {
-            throw new IllegalArgumentException("A senha deve ter pelo menos 6 caracteres");
-        }
-
-        u.setNome(u.getNome().trim());
-        u.setEmail(u.getEmail().trim().toLowerCase());
-        u.setAtivo(true);
-
-        return repository.save(u);
+        usuario.setAtivo(true);
+        return this.repository.save(usuario);
     }
 
-    public Usuario autenticar(String email, String senha){
-        if(email == null || senha== null){
-            throw new IllegalArgumentException("E-mail e senha são obrigatórios");
+    // Atualizar usando o UUID contido no objeto
+    @Transactional
+    public Usuario atualizarUUID(Usuario usuario) {
+        if (usuario.getUuid() == null) {
+            throw new IllegalArgumentException("UUID é obrigatório para atualização");
         }
-        Optional<Usuario> usuarioOpt= repository.findByEmailAndSenha(email.trim().toLowerCase(),senha);
-        return usuarioOpt.orElse(null);
+        Usuario existente = this.repository.findByUuid(usuario.getUuid())
+                .orElseThrow(() -> new NoSuchElementException("Usuário não encontrado"));
+
+        existente.setNome(usuario.getNome());
+        existente.setEmail(usuario.getEmail());
+        existente.setSenha(usuario.getSenha());
+
+        return this.repository.save(existente);
     }
-    public Usuario buscarPorId(int id){
-        return repository.findById(id).orElse(null);
+
+    // Deletar por UUID
+    @Transactional
+    public void deletarUUID(String uuid) {
+        UUID uuidFormatado = UUID.fromString(uuid);
+        if (!this.repository.existsByUuid(uuidFormatado)) {
+            throw new NoSuchElementException("Usuário não encontrado para o UUID: " + uuid);
+        }
+        this.repository.deleteByUuid(uuidFormatado);
+    }
+
+    // Autenticação / Login
+    public Usuario autenticar(String email, String senha) {
+        return this.repository.findByEmailAndSenha(email, senha)
+                .orElse(null);
     }
 }

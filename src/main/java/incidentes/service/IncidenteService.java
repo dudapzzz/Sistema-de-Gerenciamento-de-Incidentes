@@ -1,7 +1,9 @@
 package incidentes.service;
 
 import incidentes.dao.IncidenteRepository;
+import incidentes.dao.UsuarioRepository;
 import incidentes.model.Incidente;
+import incidentes.model.Usuario;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -9,9 +11,11 @@ import java.util.*;
 @Service
 public class IncidenteService {
     private final IncidenteRepository dao;
+    private final UsuarioRepository usuarioRepository;
 
-    public IncidenteService(IncidenteRepository dao) {
+    public IncidenteService(IncidenteRepository dao, UsuarioRepository usuarioRepository) {
         this.dao = dao;
+        this.usuarioRepository = usuarioRepository;
     }
 
     public List<Incidente> getIncidentes(){
@@ -37,12 +41,15 @@ public class IncidenteService {
             Optional<Incidente> incidenteOriginal = dao.findById(inc.getCodigo());
 
             if (incidenteOriginal.isPresent()) {
-                inc.setUsuarioId(incidenteOriginal.get().getUsuarioId());
+                inc.setUsuario(incidenteOriginal.get().getUsuario());
             }
         } else {
-            if (inc.getUsuarioId() <= 0) {
+            if (inc.getUsuario() == null || inc.getUsuario().getCodigo() <= 0) {
                 throw new IllegalArgumentException("O usuario do incidente e obrigatorio");
             }
+            Usuario usuario = usuarioRepository.findById(inc.getUsuario().getCodigo())
+                    .orElseThrow(() -> new NoSuchElementException("Usuário do incidente não encontrado"));
+            inc.setUsuario(usuario);
         }
         inc.setTitulo(inc.getTitulo().trim());
         inc.setResponsavel(inc.getResponsavel().trim());
@@ -59,6 +66,13 @@ public class IncidenteService {
         Incidente existente= getIncidenteByUuid(inc.getUuid().toString());
         inc.setCodigo(existente.getCodigo());
         inc.setUuid(existente.getUuid());
+        if (inc.getUsuario() == null) {
+            inc.setUsuario(existente.getUsuario());
+        } else {
+            Usuario usuario = usuarioRepository.findById(inc.getUsuario().getCodigo())
+                    .orElseThrow(() -> new NoSuchElementException("Usuário do incidente não encontrado"));
+            inc.setUsuario(usuario);
+        }
 
         return dao.save(inc);
     }
@@ -72,20 +86,20 @@ public class IncidenteService {
 
 
     public long contarNaoResolvidos(int usuarioId) {
-        return dao.countByStatusIgnoreCaseAndUsuarioId("Não resolvido", usuarioId);
+        return dao.countByStatusIgnoreCaseAndUsuario_Codigo("Não resolvido", usuarioId);
 
     }
 
     public long contarAltaRelevancia(int usuarioId) {
-        return dao.countByRelevanciaIgnoreCaseAndUsuarioId("Alta", usuarioId);
+        return dao.countByRelevanciaIgnoreCaseAndUsuario_Codigo("Alta", usuarioId);
     }
 
     public long contarEmAndamento(int usuarioId) {
-        return dao.countByStatusIgnoreCaseAndUsuarioId("Em andamento", usuarioId);
+        return dao.countByStatusIgnoreCaseAndUsuario_Codigo("Em andamento", usuarioId);
     }
 
     public long contarResolvidos(int usuarioId) {
-        return dao.countByStatusIgnoreCaseAndUsuarioId("Resolvido", usuarioId);
+        return dao.countByStatusIgnoreCaseAndUsuario_Codigo("Resolvido", usuarioId);
     }
 
     public Map<String, Integer> contarIncidentesPorRelevancia(int usuarioId) {
@@ -93,11 +107,11 @@ public class IncidenteService {
     }
 
     public List<Incidente> listarRecentes(int usuarioId) {
-        return dao.findTop3ByUsuarioIdOrderByCodigoDesc(usuarioId);
+        return dao.findTop3ByUsuario_CodigoOrderByCodigoDesc(usuarioId);
     }
 
     public List<Incidente> listarTodos(int usuarioId) {
-        return dao.findByUsuarioIdOrderByCodigoDesc(usuarioId);
+        return dao.findByUsuario_CodigoOrderByCodigoDesc(usuarioId);
     }
 
     public Incidente buscarPorCodigo(int codigo) {
