@@ -41,9 +41,9 @@ A aplicação utiliza Java, Spring Boot, JSP e PostgreSQL, com responsabilidades
 - [x] Geração de dados para relatórios por usuário.
 - [x] Validação de dados com Jakarta Validation.
 - [x] Documentação interativa dos endpoints com Swagger UI.
+- [ ] Adicionar testes.
 - [ ] Implementar envio de notificações.
 - [ ] Exportar relatórios para PDF e CSV.
-- [ ] Adicionar testes automatizados.
 
 ## Arquitetura
 
@@ -89,7 +89,7 @@ spring.datasource.username=postgres
 spring.datasource.password=sua_senha
 ```
 
-**Importante:** substitua `sua_senha` pela senha do seu ambiente local. Não publique credenciais reais no repositório.
+**Importante:** substitua `sua_senha` pela senha do seu ambiente.
 
 O Flyway executa as migrações disponíveis em `src/main/resources/db/migration` durante a inicialização.
 
@@ -101,17 +101,11 @@ Com Maven:
 mvn spring-boot:run
 ```
 
-No Windows, também é possível usar o Maven Wrapper:
-
-```powershell
-.\mvnw.cmd spring-boot:run
-```
-
 A aplicação utiliza a porta `8080` e o contexto `/incidentes`.
 
 ## Acessos
 
-Após iniciar a aplicação, acesse:
+Após iniciar, acesse:
 
 - **Interface web:** http://localhost:8080/incidentes/
 - **Swagger UI:** http://localhost:8080/incidentes/swagger-ui.html
@@ -119,11 +113,9 @@ Após iniciar a aplicação, acesse:
 
 Os endpoints REST estão organizados sob `/usuarios`, `/login`, `/incidente`, `/ativo` e `/relatorios`.
 
-Consulte o Swagger UI para verificar os parâmetros, os formatos esperados e as respostas dos endpoints.
-
 ## Testes
 
-O projeto ainda não possui testes automatizados no diretório `src/test`.
+O projeto ainda não possui testes no diretório `src/test`.
 
 Quando forem adicionados, poderão ser executados com:
 
@@ -150,7 +142,7 @@ O desenvolvimento do projeto proporciona prática com:
 
 - [ ] Implementar notificações de incidentes.
 - [ ] Adicionar exportação de relatórios em PDF e CSV.
-- [ ] Criar testes automatizados para controllers e serviços.
+- [ ] Criar testes para controllers e services.
 - [ ] Aprimorar a documentação de configuração e uso.
 - [ ] Revisar melhorias de segurança e controle de acesso.
 
