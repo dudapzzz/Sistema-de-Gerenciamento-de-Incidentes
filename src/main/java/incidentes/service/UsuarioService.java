@@ -42,11 +42,9 @@ public class UsuarioService {
 
     // Atualizar usando o UUID contido no objeto
     @Transactional
-    public Usuario atualizarUUID(Usuario usuario) {
-        if (usuario.getUuid() == null) {
-            throw new IllegalArgumentException("UUID é obrigatório para atualização");
-        }
-        Usuario existente = this.repository.findByUuid(usuario.getUuid())
+    public Usuario atualizarUUID(String uuid, Usuario usuario) {
+        UUID uuidFormatado = UUID.fromString(uuid);
+        Usuario existente = this.repository.findByUuid(uuidFormatado)
                 .orElseThrow(() -> new NoSuchElementException("Usuário não encontrado"));
 
         existente.setNome(usuario.getNome());

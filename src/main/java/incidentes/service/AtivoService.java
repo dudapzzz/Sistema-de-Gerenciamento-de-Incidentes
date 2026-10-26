@@ -53,23 +53,19 @@ public class AtivoService {
 
         return dao.save(ativo);
     }
-    public Ativo updateAtivoByUuid(Ativo ativo) {
-        if (ativo.getUuid() == null) {
-            throw new IllegalArgumentException("UUID é obrigatório para atualização");
-        }
-
-        Ativo ativoExistente = getAtivoByUuid(ativo.getUuid().toString());
-        ativo.setId(ativoExistente.getId());
-        ativo.setUuid(ativoExistente.getUuid());
-        if (ativo.getUsuario() == null) {
-            ativo.setUsuario(ativoExistente.getUsuario());
-        } else {
+    public Ativo updateAtivoByUuid(String uuid, Ativo ativo) {
+        Ativo ativoExistente = getAtivoByUuid(uuid);
+        ativoExistente.setNome(ativo.getNome());
+        ativoExistente.setTipo(ativo.getTipo());
+        ativoExistente.setIpOuUrl(ativo.getIpOuUrl());
+        ativoExistente.setCriticidade(ativo.getCriticidade());
+        if (ativo.getUsuario() != null) {
             Usuario usuario = usuarioRepository.findById(ativo.getUsuario().getCodigo())
                     .orElseThrow(() -> new NoSuchElementException("Usuário do ativo não encontrado"));
-            ativo.setUsuario(usuario);
+            ativoExistente.setUsuario(usuario);
         }
 
-        return dao.save(ativo);
+        return dao.save(ativoExistente);
     }
 
     public boolean excluirPorUuid(String uuidStr) {

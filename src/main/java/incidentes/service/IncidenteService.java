@@ -58,23 +58,21 @@ public class IncidenteService {
         return dao.save(inc);
     }
 
-    public Incidente updateIncidenteByUuid(Incidente inc){
-        if(inc.getUuid() == null){
-            throw new IllegalArgumentException("UUID é obrigatorio");
-        }
-
-        Incidente existente= getIncidenteByUuid(inc.getUuid().toString());
-        inc.setCodigo(existente.getCodigo());
-        inc.setUuid(existente.getUuid());
-        if (inc.getUsuario() == null) {
-            inc.setUsuario(existente.getUsuario());
-        } else {
+    public Incidente updateIncidenteByUuid(String uuid, Incidente inc){
+        Incidente existente= getIncidenteByUuid(uuid);
+        existente.setTitulo(inc.getTitulo());
+        existente.setDescricao(inc.getDescricao());
+        existente.setRelevancia(inc.getRelevancia());
+        existente.setDataIncidente(inc.getDataIncidente());
+        existente.setStatus(inc.getStatus());
+        existente.setResponsavel(inc.getResponsavel());
+        if (inc.getUsuario() != null) {
             Usuario usuario = usuarioRepository.findById(inc.getUsuario().getCodigo())
                     .orElseThrow(() -> new NoSuchElementException("Usuário do incidente não encontrado"));
-            inc.setUsuario(usuario);
+            existente.setUsuario(usuario);
         }
 
-        return dao.save(inc);
+        return dao.save(existente);
     }
 
     public boolean excluirPorUuid(String uuidStr) {

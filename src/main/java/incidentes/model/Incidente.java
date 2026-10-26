@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.util.Date;
@@ -28,6 +29,7 @@ public class Incidente{
     )
     private UUID uuid;
 
+    @NotBlank(message = "Título é obrigatório")
     @Column(nullable = false)
     @Schema(description = "Título do incidente", example = "Vazamento de senha")
     private String titulo;

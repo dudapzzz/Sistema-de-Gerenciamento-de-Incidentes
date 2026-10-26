@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.util.UUID;
@@ -22,6 +23,7 @@ public class Ativo {
     @Schema(description = "UUID público do ativo")
     private UUID uuid;
 
+    @NotBlank(message= "Nome é obrigatório")
     @Column(nullable = false)
     @Schema(description = "Nome do ativo", example = "Servidor Principal")
     private String nome;
@@ -34,10 +36,10 @@ public class Ativo {
     @Schema(description = "IP ou URL do ativo", example = "192.168.1.10")
     private String ipOuUrl;
 
+    @NotBlank(message= "Criticidade é obrigatório")
     @Column(nullable = false)
     @Schema(description = "Nível de criticidade", example = "Alta")
     private String criticidade;
-
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "usuario_id", nullable = false)
