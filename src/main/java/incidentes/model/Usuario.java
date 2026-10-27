@@ -1,64 +1,59 @@
 package incidentes.model;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
 import org.hibernate.annotations.UuidGenerator;
 
+import java.util.Objects;
 import java.util.UUID;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "usuario")
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "codigo")
-@Schema(description = "Entidade que representa um usuáio do sistema")
 public class Usuario{
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Schema(description = "Código identificador do usuário")
-    private Integer codigo;
+    private Long codigo;
 
     @UuidGenerator
     @Column(unique = true, updatable = false)
-    @Schema(description = "UUID público do usuário",example = "edddd513-9ecd-45ac-8387-16256eae723a")
     private UUID uuid;
 
     @NotBlank(message = "Nome é obrigatório")
     @Column(nullable = false)
-    @Schema(description = "Nome do usuário", example = "Gabriel Silva")
     private String nome;
 
     @NotBlank(message = "Email é obrigatório")
     @Email(message = "Email inválido")
     @Column(nullable = false, unique = true)
-    @Schema(description = "E-mail do usuário", example = "gabriel@gmail.com")
     private String email;
 
     @NotBlank(message = "Senha é obrigatória")
     @Size(min = 6, message = "A senha deve ter no mínimo 6 caracteres")
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @Schema(description = "Senha do usuário")
+    @JsonIgnore //garante que a senha nao seja retornada no json
+    @Column(nullable = false)
     private String senha;
 
-    @Schema(description = "Indica se o usuário está ativo no sistema", example = "true")
+    @Column(nullable = false)
     private Boolean ativo= true;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "usuario")
     private List<Ativo> ativos = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "usuario")
     private List<Incidente> incidentes = new ArrayList<>();
 
     public Usuario(){
     }
 
-    public Usuario(Integer codigo, String nome, String email, String senha, boolean ativo){
+    public Usuario(Long codigo, String nome, String email, String senha, boolean ativo){
         this.codigo = codigo;
         this.nome = nome;
         this.email = email;
@@ -66,11 +61,11 @@ public class Usuario{
         this.ativo = ativo;
     }
 
-    public int getCodigo() {
+    public Long getCodigo() {
         return codigo;
     }
 
-    public void setCodigo(Integer codigo) {
+    public void setCodigo(Long codigo) {
         this.codigo = codigo;
     }
 
@@ -110,5 +105,35 @@ public class Usuario{
 
     public void setAtivo(Boolean ativo) {
         this.ativo = ativo;
+    }
+
+    public List<Incidente> getIncidentes(){
+        return incidentes;
+    }
+
+    public void setIncidentes(List<Incidente> incidentes){
+        this.incidentes = incidentes;
+    }
+
+    public void addAtivo(Ativo ativo){
+        ativos.add(ativo);
+        ativo.setUsuario(this);
+    }
+
+    public void addIncidente(Incidente incidente){
+        incidentes.add(incidente);
+        incidente.setUsuario(this);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Usuario usuario = (Usuario) o;
+        return Objects.equals(uuid, usuario.uuid);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(uuid);
     }
 }

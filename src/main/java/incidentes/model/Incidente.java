@@ -1,65 +1,58 @@
 package incidentes.model;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import org.hibernate.annotations.UuidGenerator;
 
+import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.Objects;
 import java.util.UUID;
 
 @Entity
 @Table(name = "incidente")
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "codigo")
-@Schema(description = "Entidade que representa um incidente identificado")
-
 public class Incidente{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Schema(description = "Código identificador do incidente", example = "01")
-    private int codigo;
+    private Long codigo;
 
     @UuidGenerator
-    @Column(unique = true, updatable = false)
-    @Schema(
-            description = "UUID público do incidente",
-            example = "3fa85f64-5717-4562-b3fc-2c963f66afa6"
-    )
+    @Column(name = "uuid", unique = true, updatable = false, nullable = false)
     private UUID uuid;
 
     @NotBlank(message = "Título é obrigatório")
     @Column(nullable = false)
-    @Schema(description = "Título do incidente", example = "Vazamento de senha")
     private String titulo;
 
+    @NotBlank(message = "Descrição é obrigatória")
     @Column(nullable = false)
-    @Schema(description = "Descrição do incidente", example = "Fui informado que houve um acesso ao sistema da empresa em um local desconhecido")
     private String descricao;
 
-    @Column(nullable = false)
-    @Schema(description = "Grau de relevância do incidente", example = "Alto")
-    private String relevancia;
+    @NotNull(message = "Severidade é obrigatória")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "severidade", nullable = false)
+    private NivelSeveridade severidade;
 
     @Column(name = "data_incidente")
-    @Schema(description = "Data do registro do incidente")
-    private Date dataIncidente;
+    private LocalDateTime dataIncidente;
 
+
+    @NotNull(message = "Status é obrigatório")
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    @Schema(description = "Status da resolução do incidente", example = "Em andamento")
-    private String status;
+    private StatusIncidente status;
 
-    @Schema(description = "Responsável pela resolução do incidente", example = "Carlos")
+    @Column(length = 100)
     private String responsavel;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "usuario_id", nullable = false)
-    @Schema(description = "Usuário que registrou o incidente")
     private Usuario usuario;
 
     public Incidente(){
-        this.dataIncidente = new Date();
+        this.dataIncidente = LocalDateTime.now();
+        this.status = StatusIncidente.NAO_RESOLVIDO;
     }
 
 
@@ -71,11 +64,11 @@ public class Incidente{
         this.responsavel = responsavel;
     }
 
-    public int getCodigo() {
+    public Long getCodigo() {
         return codigo;
     }
 
-    public void setCodigo(int codigo) {
+    public void setCodigo(Long codigo) {
         this.codigo = codigo;
     }
 
@@ -95,27 +88,27 @@ public class Incidente{
         this.descricao = descricao;
     }
 
-    public String getRelevancia() {
-        return relevancia;
+    public NivelSeveridade getSeveridade() {
+        return severidade;
     }
 
-    public void setRelevancia(String relevancia) {
-        this.relevancia = relevancia;
+    public void setSeveridade(NivelSeveridade severidade) {
+        this.severidade = severidade;
     }
 
-    public Date getDataIncidente() {
+    public LocalDateTime getDataIncidente() {
         return dataIncidente;
     }
 
-    public void setDataIncidente(Date dataIncidente) {
+    public void setDataIncidente(LocalDateTime dataIncidente) {
         this.dataIncidente = dataIncidente;
     }
 
-    public String getStatus() {
+    public StatusIncidente getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(StatusIncidente status) {
         this.status = status;
     }
 
@@ -130,5 +123,17 @@ public class Incidente{
     public UUID getUuid() {return uuid;}
 
     public void setUuid(UUID uuid) {this.uuid = uuid;}
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Incidente incidente = (Incidente) o;
+        return Objects.equals(uuid, incidente.uuid);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(uuid);
+    }
 }
 

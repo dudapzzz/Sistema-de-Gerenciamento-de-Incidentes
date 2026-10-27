@@ -1,56 +1,54 @@
 package incidentes.model;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import org.hibernate.annotations.UuidGenerator;
 
+import java.util.Objects;
 import java.util.UUID;
 
 @Entity
 @Table(name= "ativo")
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Ativo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     @UuidGenerator
-    @Column(unique = true, updatable = false)
-    @Schema(description = "UUID público do ativo")
+    @Column(name = "uuid", unique = true, updatable = false)
     private UUID uuid;
 
     @NotBlank(message= "Nome é obrigatório")
     @Column(nullable = false)
-    @Schema(description = "Nome do ativo", example = "Servidor Principal")
     private String nome;
 
+    @NotNull(message = "Tipo é obrigatório")
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    @Schema(description = "Tipo do ativo", example = "Servidor")
-    private String tipo;
+    private TipoAtivo tipo;
 
     @Column(name = "ip_ou_url")
-    @Schema(description = "IP ou URL do ativo", example = "192.168.1.10")
     private String ipOuUrl;
 
-    @NotBlank(message= "Criticidade é obrigatório")
+    @NotBlank(message= "Criticidade é obrigatória")
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    @Schema(description = "Nível de criticidade", example = "Alta")
-    private String criticidade;
+    private Criticidade criticidade;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "usuario_id", nullable = false)
-    @Schema(description = "Usuário responsável pelo ativo")
     private Usuario usuario;
 
-    public int getId() {
+    public Ativo(){
+    }
+
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -66,11 +64,11 @@ public class Ativo {
         this.nome = nome;
     }
 
-    public String getTipo() {
+    public TipoAtivo getTipo() {
         return tipo;
     }
 
-    public void setTipo(String tipo) {
+    public void setTipo(TipoAtivo tipo) {
         this.tipo = tipo;
     }
 
@@ -82,11 +80,11 @@ public class Ativo {
         this.ipOuUrl = ipOuUrl;
     }
 
-    public String getCriticidade() {
+    public Criticidade getCriticidade() {
         return criticidade;
     }
 
-    public void setCriticidade(String criticidade) {
+    public void setCriticidade(Criticidade criticidade) {
         this.criticidade = criticidade;
     }
 
@@ -96,5 +94,18 @@ public class Ativo {
 
     public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
+    }
+
+    //ensina o java a comparar se dois ativos sao iguais
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Ativo ativo = (Ativo) o;
+        return Objects.equals(uuid, ativo.uuid);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(uuid); //gerou hash
     }
 }
