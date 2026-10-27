@@ -9,7 +9,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface AtivoRepository extends JpaRepository<Ativo, Integer> {
+public interface AtivoRepository extends JpaRepository<Ativo, Long> {
     Optional<Ativo> findByUuid(UUID uuid);
     List<Ativo> findByUsuarioUuidOrderByIdDesc(UUID usuarioUuid);
 }
