@@ -1,6 +1,7 @@
 package incidentes.service;
 
 import incidentes.dao.UsuarioRepository;
+import incidentes.infra.CredenciaisInvalidasException;
 import incidentes.model.Usuario;
 import org.springframework.stereotype.Service;
 
@@ -15,29 +16,17 @@ public class LoginService {
         this.dao = dao;
     }
 
-    public Usuario autenticar(String email, String senha){
-        if(email == null || senha == null){
-            return null;
-        }
-        String emailIgual= email.trim().toLowerCase();
+    public Usuario autenticar(String email, String senha) {
+        String emailNormalizado = email.trim().toLowerCase();
 
-        Optional<Usuario> usuarioOptional = dao.findByEmailAndSenha(emailIgual, senha);
+        Usuario usuario = dao.findByEmail(emailNormalizado)
+                .orElseThrow(CredenciaisInvalidasException::new);
 
-        if(usuarioOptional.isEmpty()){
-            return null;
+        if (!usuario.isAtivo() || !usuario.getSenha().equals(senha)) {
+            throw new CredenciaisInvalidasException();
         }
-        Usuario usuario = usuarioOptional.get();
 
-        if(!usuario.isAtivo()){
-            System.out.println("Usuario inativo tentando entrar");
-            return null;
-        }
         return usuario;
     }
 
-    public Usuario getUsuarioByUuid(String uuidStr){
-        UUID uuid = UUID.fromString(uuidStr);
-        return dao.findByUuid(uuid)
-                .orElseThrow(() -> new NoSuchElementException("Usuário não encontrado para o UUID: " + uuidStr));
-    }
 }

@@ -4,23 +4,21 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import incidentes.infra.CredenciaisInvalidasException;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 
-import static java.util.stream.Collectors.toList;
 
 @RestControllerAdvice
 public class TratadorDeErros {
-    public record DadosErroValidacao(String campo, String mensagem){
-        public DadosErroValidacao(FieldError error){
-            this(error.getField(), error.getDefaultMessage());
-        }
-    }
 
     public record ErroResposta(int status, String erro, String mensagem, LocalDateTime timestamp){
         public ErroResposta(int status, String erro, String mensagem){
@@ -29,29 +27,78 @@ public class TratadorDeErros {
         }
     }
 
+    public record ErroValidacao(String campo, String mensagem){
+        public ErroValidacao(FieldError error){
+            this(error.getField(), error.getDefaultMessage());
+        }
+    }
+
     //404
-    @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<Void> tratarErro404(){
-        return ResponseEntity.notFound().build();
+    @ExceptionHandler({EntityNotFoundException.class, NoSuchElementException.class})
+    public ResponseEntity<ErroResposta> tratarNaoEncontrado(Exception ex){
+        return responder(HttpStatus.NOT_FOUND, "Recurso não encontrado", ex.getMessage());
     }
 
     //400
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<List<DadosErroValidacao>> tratarErro400(MethodArgumentNotValidException ex){
-        List<DadosErroValidacao> erros = ex.getFieldErrors().stream()
-                .map(DadosErroValidacao::new).toList();
+    public ResponseEntity<List<ErroValidacao>> tratarValidacao(MethodArgumentNotValidException ex){
+        List<ErroValidacao> erros = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(ErroValidacao::new)
+                .toList();
         return ResponseEntity.badRequest().body(erros);
     }
 
-    @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<ErroResposta> tratarErroConflito(){
-        ErroResposta erro= new ErroResposta(
-                HttpStatus.CONFLICT.value(),
-                "Conflito de dados",
-                "Dado já cadastrado ou vínculo inválido"
+    @ExceptionHandler({
+            IllegalArgumentException.class,
+            MethodArgumentTypeMismatchException.class,
+            HttpMessageNotReadableException.class
+    })
+    public ResponseEntity<ErroResposta> tratarRequisicaoInvalida(Exception ex) {
+        return responder(
+                HttpStatus.BAD_REQUEST,
+                "Requisição inválida",
+                "Verifique os dados enviados."
         );
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(erro);
     }
 
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErroResposta> tratarConflito(
+            DataIntegrityViolationException ex
+    ) {
+        return responder(
+                HttpStatus.CONFLICT,
+                "Conflito de dados",
+                "Os dados informados conflitam com um registro ou vínculo existente."
+        );
+    }
 
+    private ResponseEntity<ErroResposta> responder(
+            HttpStatus status,
+            String erro,
+            String mensagem
+    ) {
+        ErroResposta corpo = new ErroResposta(
+                status.value(),
+                erro,
+                mensagem == null ? erro : mensagem
+        );
+
+        return ResponseEntity.status(status).body(corpo);
+
+
+    }
+
+    @ExceptionHandler(CredenciaisInvalidasException.class)
+    public ResponseEntity<ErroResposta> tratarCredenciaisInvalidas(
+            CredenciaisInvalidasException ex
+    ) {
+        return responder(
+                HttpStatus.UNAUTHORIZED,
+                "Não autorizado",
+                ex.getMessage()
+        );
+    }
 }
+

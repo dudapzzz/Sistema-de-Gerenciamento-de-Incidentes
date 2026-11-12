@@ -3,10 +3,10 @@ package incidentes.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -22,17 +22,19 @@ public class Incidente{
     private UUID uuid;
 
     @NotBlank(message = "Título é obrigatório")
+    @Size(min = 5, message = "O título deve ter pelo menos 5 caracteres")
     @Column(nullable = false)
     private String titulo;
 
     @NotBlank(message = "Descrição é obrigatória")
+    @Size(min = 10, message = "A descrição deve ter pelo menos 10 caracteres")
     @Column(nullable = false)
     private String descricao;
 
     @NotNull(message = "Severidade é obrigatória")
     @Enumerated(EnumType.STRING)
     @Column(name = "severidade", nullable = false)
-    private NivelSeveridade severidade;
+    private Criticidade severidade;
 
     @Column(name = "data_incidente")
     private LocalDateTime dataIncidente;
@@ -88,11 +90,11 @@ public class Incidente{
         this.descricao = descricao;
     }
 
-    public NivelSeveridade getSeveridade() {
+    public Criticidade getSeveridade() {
         return severidade;
     }
 
-    public void setSeveridade(NivelSeveridade severidade) {
+    public void setSeveridade(Criticidade severidade) {
         this.severidade = severidade;
     }
 

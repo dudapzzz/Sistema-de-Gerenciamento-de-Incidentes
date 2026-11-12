@@ -2,6 +2,7 @@ package incidentes.service;
 
 import incidentes.dao.UsuarioRepository;
 import incidentes.model.Usuario;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,54 +20,45 @@ public class UsuarioService {
     }
 
     @Transactional(readOnly = true)
-    public List<Usuario> getUsuarios() {
+    public List<Usuario> listarTodos() {
         return this.repository.findAll();
     }
 
     // Buscar por UUID (Converte a String recebida da Web)
     @Transactional(readOnly = true)
-    public Usuario getUsuarioUUID(String uuid) {
-        UUID uuidFormatado = UUID.fromString(uuid);
-        return this.repository.findByUuid(uuidFormatado)
-                .orElseThrow(() -> new NoSuchElementException("Usuário não encontrado para o UUID: " + uuid));
+    public Usuario buscarPorUuid(UUID uuid) {
+        return this.repository.findByUuid(uuid)
+                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado para o UUID: " + uuid));
     }
 
     @Transactional
-    public Usuario inserir(Usuario usuario) {
-        if (usuario.getUuid() == null) {
-            usuario.setUuid(UUID.randomUUID());
-        }
+    public Usuario salvar(Usuario usuario) {
+        usuario.setNome(usuario.getNome().trim());
+        usuario.setEmail(usuario.getEmail().trim().toLowerCase());
         usuario.setAtivo(true);
-        return this.repository.save(usuario);
+
+        return repository.save(usuario);
     }
 
-    // Atualizar usando o UUID contido no objeto
     @Transactional
-    public Usuario atualizarUUID(String uuid, Usuario usuario) {
-        UUID uuidFormatado = UUID.fromString(uuid);
-        Usuario existente = this.repository.findByUuid(uuidFormatado)
-                .orElseThrow(() -> new NoSuchElementException("Usuário não encontrado"));
+    public Usuario atualizarPorUuid(UUID uuid, Usuario dados) {
 
-        existente.setNome(usuario.getNome());
-        existente.setEmail(usuario.getEmail());
-        existente.setSenha(usuario.getSenha());
+        Usuario existente = buscarPorUuid(uuid);
 
-        return this.repository.save(existente);
+        existente.setNome(dados.getNome().trim());
+        existente.setEmail(dados.getEmail().trim().toLowerCase());
+
+        if (dados.getSenha() != null && !dados.getSenha().isBlank()) {
+            existente.setSenha(dados.getSenha());
+        }
+
+        return repository.save(existente);
     }
 
     // Deletar por UUID
     @Transactional
-    public void deletarUUID(String uuid) {
-        UUID uuidFormatado = UUID.fromString(uuid);
-        if (!this.repository.existsByUuid(uuidFormatado)) {
-            throw new NoSuchElementException("Usuário não encontrado para o UUID: " + uuid);
-        }
-        this.repository.deleteByUuid(uuidFormatado);
+    public void excluirPorUuid(UUID uuid) {
+        repository.delete(buscarPorUuid(uuid));
     }
 
-    // Autenticação / Login
-    public Usuario autenticar(String email, String senha) {
-        return this.repository.findByEmailAndSenha(email, senha)
-                .orElse(null);
-    }
 }

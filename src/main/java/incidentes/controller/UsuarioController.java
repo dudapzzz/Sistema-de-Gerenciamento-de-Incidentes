@@ -31,9 +31,7 @@ public class UsuarioController {
     @ApiResponse(responseCode = "200", description = "Lista de usuarios obtida com sucesso")
     public ResponseEntity<List<Usuario>> listar() {
 
-        List<Usuario> usuarios = this.usuarioService.getUsuarios();
-
-        usuarios.forEach(u -> u.setSenha(null));
+        List<Usuario> usuarios = this.usuarioService.listarTodos();
         return ResponseEntity.ok(usuarios);
     }
 
@@ -43,10 +41,8 @@ public class UsuarioController {
             @ApiResponse(responseCode = "200", description = "Usuário encontrado"),
             @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
     })
-    public ResponseEntity<Usuario> getUsuarioByUuid(@PathVariable UUID uuid) {
-        Usuario usuario= this.usuarioService.getUsuarioUUID(uuid.toString());
-        usuario.setSenha(null);
-        return ResponseEntity.ok(usuario);
+    public ResponseEntity<Usuario> buscarPorUuid(@PathVariable UUID uuid) {
+        return ResponseEntity.ok(usuarioService.buscarPorUuid(uuid));
     }
 
     @PostMapping
@@ -56,10 +52,8 @@ public class UsuarioController {
             @ApiResponse(responseCode = "400", description = "Dados inválidos")
     })
     public ResponseEntity<Usuario> salvar(@RequestBody @Valid Usuario usuario, UriComponentsBuilder uriBuilder) {
-        Usuario usuarioSalvo = this.usuarioService.inserir(usuario);
+        Usuario usuarioSalvo = this.usuarioService.salvar(usuario);
         URI uri = uriBuilder.path("/usuarios/{uuid}").buildAndExpand(usuarioSalvo.getUuid()).toUri();
-
-        usuarioSalvo.setSenha(null);
         return ResponseEntity.created(uri).body(usuarioSalvo);
     }
 
@@ -70,10 +64,11 @@ public class UsuarioController {
             @ApiResponse(responseCode = "400", description = "Dados de entrada inválidos"),
             @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
     })
-    public ResponseEntity<Usuario> atualizar(@PathVariable UUID uuid, @RequestBody @Valid Usuario usuario) {
-        Usuario usuarioAtualizado = this.usuarioService.atualizarUUID(uuid.toString(), usuario);
-        usuarioAtualizado.setSenha(null);
-        return ResponseEntity.ok(usuarioAtualizado);
+    public ResponseEntity<Usuario> atualizar(
+            @PathVariable UUID uuid,
+            @RequestBody @Valid Usuario usuario
+    ) {
+        return ResponseEntity.ok(usuarioService.atualizarPorUuid(uuid, usuario));
     }
 
     @DeleteMapping("/{uuid}")
@@ -83,7 +78,7 @@ public class UsuarioController {
             @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
     })
     public ResponseEntity<Void> deletar(@PathVariable UUID uuid) {
-        this.usuarioService.deletarUUID(uuid.toString());
+        this.usuarioService.excluirPorUuid(uuid);
         return ResponseEntity.noContent().build();
     }
 }

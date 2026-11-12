@@ -32,7 +32,7 @@ public class Ativo {
     @Column(name = "ip_ou_url")
     private String ipOuUrl;
 
-    @NotBlank(message= "Criticidade é obrigatória")
+    @NotNull(message = "criticidade é obrigatoria")
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Criticidade criticidade;

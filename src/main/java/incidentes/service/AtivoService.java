@@ -4,7 +4,9 @@ import incidentes.dao.AtivoRepository;
 import incidentes.dao.UsuarioRepository;
 import incidentes.model.Ativo;
 import incidentes.model.Usuario;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -14,66 +16,87 @@ import java.util.UUID;
 @Service
 public class AtivoService {
 
-    private final AtivoRepository dao;
+    private final AtivoRepository ativoRepository;
     private final UsuarioRepository usuarioRepository;
 
-    public AtivoService(AtivoRepository dao, UsuarioRepository usuarioRepository) {
-        this.dao = dao;
+    public AtivoService(AtivoRepository ativoRepository, UsuarioRepository usuarioRepository) {
+        this.ativoRepository = ativoRepository;
         this.usuarioRepository = usuarioRepository;
     }
 
-    public List<Ativo> getAtivos() {
-        return dao.findAll();
+    @Transactional(readOnly = true)
+    public List<Ativo> listarTodos(){
+        return ativoRepository.findAll();
     }
 
-    public List<Ativo> listarPorUsuarioUuid(String usuarioUuidStr) {
-        UUID uuidFormatado = UUID.fromString(usuarioUuidStr);
+    @Transactional(readOnly = true)
+    public List<Ativo> listarPorUsuarioUuid(UUID usuarioUuid) {
+        validarUsuario(usuarioUuid);
+        return ativoRepository.findByUsuario_UuidOrderByIdDesc(usuarioUuid);
+    }
 
-        if (!usuarioRepository.existsByUuid(uuidFormatado)) {
-            throw new NoSuchElementException("Usuário não encontrado para o UUID: " + usuarioUuidStr);
+    @Transactional(readOnly = true)
+    public Ativo buscarPorUuid(UUID uuid) {
+        return ativoRepository.findByUuid(uuid).orElseThrow(() -> new EntityNotFoundException("Ativo nao encontrado para o uuid: " +uuid));
+    }
+
+    @Transactional
+    public Ativo salvar(Ativo ativo) {
+        if (ativo.getUsuario() == null || ativo.getUsuario().getUuid() == null) {
+            throw new IllegalArgumentException("O usuário do ativo é obrigatório.");
         }
 
-        return dao.findByUsuarioUuidOrderByIdDesc(uuidFormatado);
-    }
-    public Ativo getAtivoByUuid(String uuidStr) {
-        UUID uuid = UUID.fromString(uuidStr);
-        return dao.findByUuid(uuid).orElseThrow(() -> new NoSuchElementException("Ativo nao encontrado para o uuid: " +uuidStr));
+        Usuario usuario = buscarUsuario(ativo.getUsuario().getUuid());
+        ativo.setUsuario(usuario);
+        normalizarCampos(ativo);
+
+        return ativoRepository.save(ativo);
     }
 
-    public Ativo saveAtivo(Ativo ativo) {
-        if (ativo.getUsuario() != null && ativo.getUsuario().getUuid() != null) {
-            Usuario usuario = usuarioRepository.findByUuid(ativo.getUsuario().getUuid())
-                    .orElseThrow(() -> new NoSuchElementException("Usuário informado para o ativo não foi encontrado"));
-            ativo.setUsuario(usuario);
+    @Transactional
+    public Ativo atualizarPorUuid(UUID uuid, Ativo dados) {
+        Ativo existente = buscarPorUuid(uuid);
+
+        existente.setNome(dados.getNome().trim());
+        existente.setTipo(dados.getTipo());
+        existente.setIpOuUrl(dados.getIpOuUrl());
+        existente.setCriticidade(dados.getCriticidade());
+
+        if (dados.getUsuario() != null && dados.getUsuario().getUuid() != null) {
+            existente.setUsuario(buscarUsuario(dados.getUsuario().getUuid()));
         }
 
-        if (ativo.getNome() != null) ativo.setNome(ativo.getNome().trim());
-        if (ativo.getTipo() != null) ativo.setTipo(ativo.getTipo().trim());
-        if (ativo.getIpOuUrl() != null) ativo.setIpOuUrl(ativo.getIpOuUrl().trim());
-
-        return dao.save(ativo);
+        normalizarCampos(existente);
+        return ativoRepository.save(existente);
     }
-    public Ativo updateAtivoByUuid(String uuid, Ativo ativo) {
-        Ativo ativoExistente = getAtivoByUuid(uuid);
-        ativoExistente.setNome(ativo.getNome());
-        ativoExistente.setTipo(ativo.getTipo());
-        ativoExistente.setIpOuUrl(ativo.getIpOuUrl());
-        ativoExistente.setCriticidade(ativo.getCriticidade());
-        if (ativo.getUsuario() != null) {
-            Usuario usuario = usuarioRepository.findById(ativo.getUsuario().getCodigo())
-                    .orElseThrow(() -> new NoSuchElementException("Usuário do ativo não encontrado"));
-            ativoExistente.setUsuario(usuario);
+
+    @Transactional
+    public void excluirPorUuid(UUID uuid) {
+        Ativo ativo = buscarPorUuid(uuid);
+        ativoRepository.delete(ativo);
+    }
+
+    private Usuario buscarUsuario(UUID uuid) {
+        return usuarioRepository.findByUuid(uuid)
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Usuário não encontrado: " + uuid)
+                );
+    }
+
+    private void validarUsuario(UUID uuid) {
+        if (!usuarioRepository.existsByUuid(uuid)) {
+            throw new EntityNotFoundException("Usuário não encontrado: " + uuid);
         }
-
-        return dao.save(ativoExistente);
     }
 
-    public boolean excluirPorUuid(String uuidStr) {
-        Ativo ativo = getAtivoByUuid(uuidStr);
-        dao.delete(ativo);
-        return true;
+    private void normalizarCampos(Ativo ativo) {
+        if (ativo.getNome() != null) {
+            ativo.setNome(ativo.getNome().trim());
+        }
+        if (ativo.getIpOuUrl() != null) {
+            ativo.setIpOuUrl(ativo.getIpOuUrl().trim());
+        }
     }
-
-
-
 }
+
+

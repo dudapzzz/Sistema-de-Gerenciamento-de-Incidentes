@@ -2,139 +2,147 @@ package incidentes.service;
 
 import incidentes.dao.IncidenteRepository;
 import incidentes.dao.UsuarioRepository;
+import incidentes.model.Criticidade;
 import incidentes.model.Incidente;
+import incidentes.model.StatusIncidente;
 import incidentes.model.Usuario;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @Service
 public class IncidenteService {
-    private final IncidenteRepository dao;
+
+    private final IncidenteRepository incidenteRepository;
     private final UsuarioRepository usuarioRepository;
 
-    public IncidenteService(IncidenteRepository dao, UsuarioRepository usuarioRepository) {
-        this.dao = dao;
+    public IncidenteService(
+            IncidenteRepository incidenteRepository,
+            UsuarioRepository usuarioRepository
+    ) {
+        this.incidenteRepository = incidenteRepository;
         this.usuarioRepository = usuarioRepository;
     }
 
-    public List<Incidente> getIncidentes(){
-        return dao.findAll();
+    @Transactional(readOnly = true)
+    public List<Incidente> listarTodos() {
+        return incidenteRepository.findAll();
     }
 
-    public Incidente getIncidenteByUuid(String uuidStr){
-        UUID uuid = UUID.fromString(uuidStr);
-        return dao.findByUuid(uuid).orElseThrow(() -> new NoSuchElementException("Incidente não encontrado para o UUID: " + uuidStr));
+    @Transactional(readOnly = true)
+    public List<Incidente> listarPorUsuarioUuid(UUID usuarioUuid) {
+        buscarUsuario(usuarioUuid);
+        return incidenteRepository.findByUsuario_UuidOrderByCodigoDesc(usuarioUuid);
     }
 
-    public Incidente salvar(Incidente inc) {
-        if (inc.getTitulo() == null || inc.getTitulo().trim().length() < 5) {
-            throw new IllegalArgumentException("O titulo deve ter pelo menos 5 caracteres");
-        }
-        if (inc.getDescricao() == null || inc.getDescricao().trim().length() < 10) {
-            throw new IllegalArgumentException("A descricao deve ter pelo menos 10 caracteres");
-        }
-        if (inc.getResponsavel() == null || inc.getResponsavel().trim().isEmpty()) {
-            throw new IllegalArgumentException("O responsavel e obrigatorio");
-        }
-        if (inc.getCodigo() != 0) {
-            Optional<Incidente> incidenteOriginal = dao.findById(inc.getCodigo());
-
-            if (incidenteOriginal.isPresent()) {
-                inc.setUsuario(incidenteOriginal.get().getUsuario());
-            }
-        } else {
-            if (inc.getUsuario() == null || inc.getUsuario().getCodigo() <= 0) {
-                throw new IllegalArgumentException("O usuario do incidente e obrigatorio");
-            }
-            Usuario usuario = usuarioRepository.findById(inc.getUsuario().getCodigo())
-                    .orElseThrow(() -> new NoSuchElementException("Usuário do incidente não encontrado"));
-            inc.setUsuario(usuario);
-        }
-        inc.setTitulo(inc.getTitulo().trim());
-        inc.setResponsavel(inc.getResponsavel().trim());
-        inc.setDescricao(inc.getDescricao().trim());
-
-        return dao.save(inc);
+    @Transactional(readOnly = true)
+    public Incidente buscarPorUuid(UUID uuid) {
+        return incidenteRepository.findByUuid(uuid)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Incidente não encontrado: " + uuid
+                ));
     }
 
-    public Incidente updateIncidenteByUuid(String uuid, Incidente inc){
-        Incidente existente= getIncidenteByUuid(uuid);
-        existente.setTitulo(inc.getTitulo());
-        existente.setDescricao(inc.getDescricao());
-        existente.setRelevancia(inc.getRelevancia());
-        existente.setDataIncidente(inc.getDataIncidente());
-        existente.setStatus(inc.getStatus());
-        existente.setResponsavel(inc.getResponsavel());
-        if (inc.getUsuario() != null) {
-            Usuario usuario = usuarioRepository.findById(inc.getUsuario().getCodigo())
-                    .orElseThrow(() -> new NoSuchElementException("Usuário do incidente não encontrado"));
-            existente.setUsuario(usuario);
+    @Transactional
+    public Incidente salvar(Incidente incidente) {
+        if (incidente.getUsuario() == null
+                || incidente.getUsuario().getUuid() == null) {
+            throw new IllegalArgumentException(
+                    "O UUID do usuário do incidente é obrigatório."
+            );
         }
 
-        return dao.save(existente);
+        incidente.setUsuario(buscarUsuario(incidente.getUsuario().getUuid()));
+        normalizarCampos(incidente);
+        return incidenteRepository.save(incidente);
     }
 
-    public boolean excluirPorUuid(String uuidStr) {
-        Incidente inc = getIncidenteByUuid(uuidStr);
-        dao.delete(inc);
-        return true;
-    }
+    @Transactional
+    public Incidente atualizarPorUuid(UUID uuid, Incidente dados) {
+        Incidente existente = buscarPorUuid(uuid);
 
+        existente.setTitulo(dados.getTitulo());
+        existente.setDescricao(dados.getDescricao());
+        existente.setSeveridade(dados.getSeveridade());
+        existente.setDataIncidente(dados.getDataIncidente());
+        existente.setStatus(dados.getStatus());
+        existente.setResponsavel(dados.getResponsavel());
 
-
-    public long contarNaoResolvidos(int usuarioId) {
-        return dao.countByStatusIgnoreCaseAndUsuario_Codigo("Não resolvido", usuarioId);
-
-    }
-
-    public long contarAltaRelevancia(int usuarioId) {
-        return dao.countByRelevanciaIgnoreCaseAndUsuario_Codigo("Alta", usuarioId);
-    }
-
-    public long contarEmAndamento(int usuarioId) {
-        return dao.countByStatusIgnoreCaseAndUsuario_Codigo("Em andamento", usuarioId);
-    }
-
-    public long contarResolvidos(int usuarioId) {
-        return dao.countByStatusIgnoreCaseAndUsuario_Codigo("Resolvido", usuarioId);
-    }
-
-    public Map<String, Integer> contarIncidentesPorRelevancia(int usuarioId) {
-        return converterResultadoParaMapa(dao.getEstatisticasRelevanciaRaw(usuarioId));
-    }
-
-    public List<Incidente> listarRecentes(int usuarioId) {
-        return dao.findTop3ByUsuario_CodigoOrderByCodigoDesc(usuarioId);
-    }
-
-    public List<Incidente> listarTodos(int usuarioId) {
-        return dao.findByUsuario_CodigoOrderByCodigoDesc(usuarioId);
-    }
-
-    public Incidente buscarPorCodigo(int codigo) {
-        return dao.findById(codigo).orElse(null);
-    }
-
-    public boolean excluir(int codigo) {
-        if (!dao.existsById(codigo)) {
-            return false;
+        if (dados.getUsuario() != null && dados.getUsuario().getUuid() != null) {
+            existente.setUsuario(buscarUsuario(dados.getUsuario().getUuid()));
         }
-        dao.deleteById(codigo);
-        return true;
+
+        normalizarCampos(existente);
+        return incidenteRepository.save(existente);
     }
 
-    public Map<String, Integer> contarIncidentesPorStatus(int usuarioId) {
-        return converterResultadoParaMapa(dao.getEstatisticasStatusRaw(usuarioId));
+    @Transactional
+    public void excluirPorUuid(UUID uuid) {
+        incidenteRepository.delete(buscarPorUuid(uuid));
     }
 
-    private Map<String, Integer> converterResultadoParaMapa(List<Object[]> resultado) {
-        Map<String, Integer> mapa = new LinkedHashMap<>();
+    @Transactional(readOnly = true)
+    public Map<String, Long> contarPorStatus(UUID usuarioUuid) {
+        buscarUsuario(usuarioUuid);
+        return converterResultado(
+                incidenteRepository.getEstatisticasStatusRaw(usuarioUuid)
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public Map<String, Long> contarPorSeveridade(UUID usuarioUuid) {
+        buscarUsuario(usuarioUuid);
+        return converterResultado(
+                incidenteRepository.getEstatisticasSeveridadeRaw(usuarioUuid)
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public long contarPorStatus(UUID usuarioUuid, StatusIncidente status) {
+        buscarUsuario(usuarioUuid);
+        return incidenteRepository.countByStatusAndUsuario_Uuid(status, usuarioUuid);
+    }
+
+    @Transactional(readOnly = true)
+    public long contarPorSeveridade(UUID usuarioUuid, Criticidade severidade) {
+        buscarUsuario(usuarioUuid);
+        return incidenteRepository.countBySeveridadeAndUsuario_Uuid(
+                severidade,
+                usuarioUuid
+        );
+    }
+
+    private Usuario buscarUsuario(UUID uuid) {
+        return usuarioRepository.findByUuid(uuid)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Usuário não encontrado: " + uuid
+                ));
+    }
+
+    private Map<String, Long> converterResultado(List<Object[]> resultado) {
+        Map<String, Long> mapa = new LinkedHashMap<>();
+
         for (Object[] linha : resultado) {
-            String chave = String.valueOf(linha[0]);
-            Integer valor = ((Number) linha[1]).intValue();
-            mapa.put(chave, valor);
+            mapa.put(String.valueOf(linha[0]), ((Number) linha[1]).longValue());
         }
+
         return mapa;
+    }
+
+    private void normalizarCampos(Incidente incidente) {
+        if (incidente.getTitulo() != null) {
+            incidente.setTitulo(incidente.getTitulo().trim());
+        }
+        if (incidente.getDescricao() != null) {
+            incidente.setDescricao(incidente.getDescricao().trim());
+        }
+        if (incidente.getResponsavel() != null) {
+            incidente.setResponsavel(incidente.getResponsavel().trim());
+        }
     }
 }

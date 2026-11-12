@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import incidentes.service.LoginService;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/login")
 @Tag(name = "Autenticação", description = "Rota para autenticação de usuários")
@@ -29,11 +31,13 @@ public class LoginController{
             @ApiResponse(responseCode = "400", description = "Dados de entrada inválidos"),
             @ApiResponse(responseCode = "401", description = "E-mail ou senha incorretos")
     })
-    public ResponseEntity<Usuario> autenticar(@RequestBody @Valid LoginRequest request){
-      Usuario usuario = service.autenticar(request.email(), request.senha());
+    public ResponseEntity<LoginResposta> autenticar(@RequestBody @Valid LoginRequest request){
+        Usuario usuario = service.autenticar(request.email(), request.senha());
 
-      usuario.setSenha(null);
-      return ResponseEntity.ok(usuario);
+        return ResponseEntity.ok(
+                new LoginResposta(usuario.getUuid(), usuario.getNome(), usuario.getEmail())
+        );
+
     }
 
     public record LoginRequest(
@@ -44,6 +48,8 @@ public class LoginController{
             @NotBlank(message = "a senha é obrigatória")
             String senha
     ){   }
+
+    public record LoginResposta(UUID uuid, String nome, String email) {}
 
 
 }

@@ -6,7 +6,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -26,27 +25,26 @@ public class AtivoController {
 
     @GetMapping
     @Operation(summary = "Listar todos os ativos ou filtrar pelo uuid do usuario")
-    public ResponseEntity<List<Ativo>> listar(@RequestParam(required = false)UUID usuarioUuid) {
-
-        List<Ativo> ativos = (usuarioUuid != null)
-            ? this.ativoService.listarPorUsuarioUuid(usuarioUuid.toString())
-            : this.ativoService.getAtivos();
+    public ResponseEntity<List<Ativo>> listar(
+            @RequestParam(required = false) UUID usuarioUuid
+    ) {
+        List<Ativo> ativos = usuarioUuid == null
+                ? ativoService.listarTodos()
+                : ativoService.listarPorUsuarioUuid(usuarioUuid);
 
         return ResponseEntity.ok(ativos);
-
     }
 
     @GetMapping("/{uuid}")
     @Operation(summary = "Buscar um ativo por seu UUID")
-    public ResponseEntity<Ativo> getAtivoByUuid(@PathVariable UUID uuid) {
-        Ativo ativo = this.ativoService.getAtivoByUuid(uuid.toString());
-        return ResponseEntity.ok(ativo);
+    public ResponseEntity<Ativo> buscarPorUuid(@PathVariable UUID uuid) {
+        return ResponseEntity.ok(ativoService.buscarPorUuid(uuid));
     }
 
     @PostMapping
     @Operation(summary = "cadastrar um novo ativo")
     public ResponseEntity<Ativo> salvar(@RequestBody @Valid Ativo ativo, UriComponentsBuilder uriBuilder) {
-        Ativo ativoSalvo = this.ativoService.saveAtivo(ativo);
+        Ativo ativoSalvo = this.ativoService.salvar(ativo);
 
         URI uri = uriBuilder.path("/ativos/{uuid}").buildAndExpand(ativoSalvo.getUuid()).toUri();
         return ResponseEntity.created(uri).body(ativoSalvo);
@@ -54,15 +52,16 @@ public class AtivoController {
 
     @PutMapping("/{uuid}")
     @Operation(summary = "Atualizar um ativo por uuid")
-    public ResponseEntity<Ativo> atualizar(@PathVariable String uuid,
-                                               @RequestBody @Valid Ativo ativo) {
-        Ativo ativoAtualizado = this.ativoService.updateAtivoByUuid(uuid, ativo);
-        return ResponseEntity.ok(ativoAtualizado);
+    public ResponseEntity<Ativo> atualizar(
+            @PathVariable UUID uuid,
+            @RequestBody @Valid Ativo ativo
+    ) {
+        return ResponseEntity.ok(ativoService.atualizarPorUuid(uuid, ativo));
     }
 
     @DeleteMapping("/uuid/{uuid}")
     @Operation(summary = "Excluir um ativo por uuid")
-    public ResponseEntity<Void> deletar(@PathVariable String uuid) {
+    public ResponseEntity<Void> excluir(@PathVariable UUID uuid) {
         this.ativoService.excluirPorUuid(uuid);
         return ResponseEntity.noContent().build();
     }

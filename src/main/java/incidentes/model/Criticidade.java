@@ -1,6 +1,6 @@
 package incidentes.model;
 
-public enum NivelSeveridade {
+public enum Criticidade {
     BAIXA,
     MEDIA,
     ALTA
