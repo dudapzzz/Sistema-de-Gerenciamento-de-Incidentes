@@ -1,6 +1,7 @@
 package incidentes.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Email;
@@ -33,11 +34,13 @@ public class Usuario{
     @Column(nullable = false, unique = true)
     private String email;
 
-    @NotBlank(message = "Senha é obrigatória")
+    @NotBlank(message = "a senha é obrigatória")
     @Size(min = 6, message = "A senha deve ter no mínimo 6 caracteres")
-    @JsonIgnore //garante que a senha nao seja retornada no json
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(nullable = false)
     private String senha;
+
+    private String permissao;
 
     @Column(nullable = false)
     private Boolean ativo= true;
@@ -115,6 +118,14 @@ public class Usuario{
         this.incidentes = incidentes;
     }
 
+    public String getPermissao() {
+        return permissao;
+    }
+
+    public void setPermissao(String permissao) {
+        this.permissao = permissao;
+    }
+
     public void addAtivo(Ativo ativo){
         ativos.add(ativo);
         ativo.setUsuario(this);
@@ -124,6 +135,7 @@ public class Usuario{
         incidentes.add(incidente);
         incidente.setUsuario(this);
     }
+
 
     @Override
     public boolean equals(Object o) {

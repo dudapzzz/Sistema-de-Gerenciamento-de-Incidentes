@@ -3,6 +3,7 @@ package incidentes.service;
 import incidentes.dao.UsuarioRepository;
 import incidentes.model.Usuario;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +36,14 @@ public class UsuarioService {
     public Usuario salvar(Usuario usuario) {
         usuario.setNome(usuario.getNome().trim());
         usuario.setEmail(usuario.getEmail().trim().toLowerCase());
+
+        if (usuario.getPermissao() == null || usuario.getPermissao().isBlank()){
+            usuario.setPermissao("ROLE_USER");
+        }else{
+            usuario.setPermissao(usuario.getPermissao().trim().toUpperCase());
+        }
+
+        usuario.setSenha(new BCryptPasswordEncoder().encode(usuario.getSenha()));
         usuario.setAtivo(true);
 
         return repository.save(usuario);
